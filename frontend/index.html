@@ -1,1 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Government Welfare Schemes</title>
+</head>
+<body>
+
+  <h1>Government Welfare Schemes</h1>
+
+  <input id="search" placeholder="Search schemes..." />
+  <button onclick="searchSchemes()">Search</button>
+
+  <ul id="results"></ul>
+
+  <script>
+    function searchSchemes() {
+      const q = document.getElementById("search").value;
+
+      fetch(`http://127.0.0.1:5000/schemes/search?q=${q}`)
+        .then(res => res.json())
+        .then(data => {
+          const ul = document.getElementById("results");
+          ul.innerHTML = "";
+          data.forEach(s => {
+            const li = document.createElement("li");
+            li.textContent = s.name;
+            ul.appendChild(li);
+          });
+        });
+    }
+  </script>
+
+</body>
+</html>
 
