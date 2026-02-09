@@ -78,61 +78,139 @@ body {
 .neo-flat {
   background: var(--neo-bg);
   box-shadow:
-    6px 6px 14px 0 var(--neo-shadow-dark),
-    -6px -6px 14px 0 var(--neo-shadow-light);
+    8px 8px 18px 0 var(--neo-shadow-dark),
+    -8px -8px 18px 0 var(--neo-shadow-light);
   border: 1px solid hsl(38 18% 89% / 0.6);
 }
 
 .neo-pressed {
   background: var(--neo-bg);
   box-shadow:
-    inset 4px 4px 10px 0 var(--neo-shadow-dark),
-    inset -4px -4px 10px 0 var(--neo-shadow-light);
+    inset 5px 5px 12px 0 var(--neo-shadow-dark),
+    inset -5px -5px 12px 0 var(--neo-shadow-light);
   border: 1px solid hsl(38 18% 89% / 0.4);
 }
 
 .neo-convex {
   background: linear-gradient(145deg, hsl(40 28% 97%), hsl(36 20% 91%));
   box-shadow:
-    5px 5px 12px 0 var(--neo-shadow-dark),
-    -5px -5px 12px 0 var(--neo-shadow-light);
+    6px 6px 14px 0 var(--neo-shadow-dark),
+    -6px -6px 14px 0 var(--neo-shadow-light);
   border: 1px solid hsl(38 18% 89% / 0.5);
+}
+
+.neo-concave {
+  background: linear-gradient(145deg, hsl(36 20% 91%), hsl(40 28% 97%));
+  box-shadow:
+    inset 6px 6px 14px 0 var(--neo-shadow-dark),
+    inset -6px -6px 14px 0 var(--neo-shadow-light);
+  border: 1px solid hsl(38 18% 89% / 0.4);
 }
 
 .neo-card {
   background: linear-gradient(145deg, hsl(40 26% 96%), hsl(36 20% 91%));
   box-shadow:
-    8px 8px 16px 0 hsl(30 12% 78% / 0.65),
-    -8px -8px 16px 0 hsl(40 30% 100% / 0.8);
+    10px 10px 20px 0 hsl(30 12% 78% / 0.65),
+    -10px -10px 20px 0 hsl(40 30% 100% / 0.8);
   border: 1px solid hsl(38 20% 90% / 0.7);
   border-radius: var(--radius-lg);
+}
+
+.neo-card-hover {
+  transition: all 0.3s ease;
+}
+
+.neo-card-hover:hover {
+  box-shadow:
+    15px 15px 30px 0 hsl(30 12% 78% / 0.8),
+    -15px -15px 30px 0 hsl(40 30% 100% / 0.9);
+  transform: translateY(-2px);
 }
 
 .neo-btn {
   background: linear-gradient(145deg, hsl(40 26% 96%), hsl(36 20% 91%));
   box-shadow:
-    4px 4px 10px 0 hsl(30 12% 78% / 0.5),
-    -4px -4px 10px 0 hsl(40 30% 100% / 0.7);
+    5px 5px 12px 0 hsl(30 12% 78% / 0.5),
+    -5px -5px 12px 0 hsl(40 30% 100% / 0.7);
   border: 1px solid hsl(38 20% 90% / 0.6);
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
 }
+
 .neo-btn:hover {
   box-shadow:
-    2px 2px 6px 0 hsl(30 12% 78% / 0.5),
-    -2px -2px 6px 0 hsl(40 30% 100% / 0.7);
+    3px 3px 8px 0 hsl(30 12% 78% / 0.5),
+    -3px -3px 8px 0 hsl(40 30% 100% / 0.7);
+  transform: translateY(-1px);
 }
+
 .neo-btn:active {
   box-shadow:
-    inset 3px 3px 8px 0 var(--neo-shadow-dark),
-    inset -3px -3px 8px 0 var(--neo-shadow-light);
+    inset 4px 4px 10px 0 var(--neo-shadow-dark),
+    inset -4px -4px 10px 0 var(--neo-shadow-light);
+  transform: translateY(0);
 }
 
 .neo-input {
   background: var(--neo-bg);
   box-shadow:
-    inset 3px 3px 8px 0 hsl(30 12% 78% / 0.45),
-    inset -3px -3px 8px 0 hsl(40 30% 100% / 0.6);
+    inset 4px 4px 10px 0 hsl(30 12% 78% / 0.45),
+    inset -4px -4px 10px 0 hsl(40 30% 100% / 0.6);
   border: 1px solid hsl(38 18% 86% / 0.5);
+  transition: all 0.2s ease;
+}
+
+.neo-input:focus {
+  box-shadow:
+    inset 5px 5px 12px 0 hsl(30 12% 78% / 0.5),
+    inset -5px -5px 12px 0 hsl(40 30% 100% / 0.7),
+    0 0 0 2px var(--color-primary);
+}
+
+/* ─── 3D Neomorphic Effects ─── */
+.neo-3d {
+  background: linear-gradient(145deg, hsl(40 28% 97%), hsl(36 20% 91%));
+  box-shadow:
+    12px 12px 24px 0 hsl(30 12% 78% / 0.7),
+    -12px -12px 24px 0 hsl(40 30% 100% / 0.9),
+    inset 2px 2px 4px 0 hsl(40 30% 100% / 0.3),
+    inset -2px -2px 4px 0 hsl(30 12% 78% / 0.2);
+  border: 1px solid hsl(38 20% 90% / 0.8);
+}
+
+.neo-raised {
+  background: linear-gradient(145deg, hsl(40 28% 97%), hsl(36 20% 91%));
+  box-shadow:
+    8px 8px 16px 0 hsl(30 12% 78% / 0.6),
+    -8px -8px 16px 0 hsl(40 30% 100% / 0.8);
+  border-top: 1px solid hsl(40 30% 100% / 0.8);
+  border-left: 1px solid hsl(40 30% 100% / 0.8);
+  border-bottom: 1px solid hsl(30 12% 78% / 0.4);
+  border-right: 1px solid hsl(30 12% 78% / 0.4);
+}
+
+/* ─── Glass Morphism Utilities ─── */
+.glass {
+  background: hsl(38 25% 95% / 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(38 20% 90% / 0.5);
+}
+
+.glass-hover:hover {
+  background: hsl(38 25% 95% / 0.85);
+  backdrop-filter: blur(16px);
+}
+
+/* ─── Gradient Overlays ─── */
+.gradient-overlay-orange {
+  background: linear-gradient(135deg, hsl(27 91% 55% / 0.1), hsl(27 91% 55% / 0.3));
+}
+
+.gradient-overlay-blue {
+  background: linear-gradient(135deg, hsl(220 65% 48% / 0.1), hsl(220 65% 48% / 0.3));
+}
+
+.gradient-overlay-purple {
+  background: linear-gradient(135deg, hsl(280 60% 52% / 0.1), hsl(280 60% 52% / 0.3));
 }
 
 /* ─── Helper utilities ─── */
@@ -150,7 +228,7 @@ body {
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  50% { transform: translateY(-10px); }
 }
 
 @keyframes shimmer {
@@ -168,8 +246,33 @@ body {
   to { transform: translateX(0); opacity: 1; }
 }
 
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px hsl(27 91% 55% / 0.3); }
+  50% { box-shadow: 0 0 40px hsl(27 91% 55% / 0.6), 0 0 60px hsl(27 91% 55% / 0.3); }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes scale-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
 .animate-float {
-  animation: float 3s ease-in-out infinite;
+  animation: float 4s ease-in-out infinite;
 }
 
 .animate-shimmer {
@@ -180,7 +283,7 @@ body {
     var(--color-muted) 100%
   );
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 2s infinite;
 }
 
 .animate-slide-in-right {
@@ -191,6 +294,27 @@ body {
   animation: slide-in-left 0.5s ease-out;
 }
 
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+.animate-rotate-slow {
+  animation: rotate-slow 20s linear infinite;
+}
+
+.animate-scale-pulse {
+  animation: scale-pulse 2s ease-in-out infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 5s ease infinite;
+}
+
 ::selection {
   background: hsl(24 12% 14% / 0.12);
 }
@@ -199,3 +323,121 @@ body {
   outline: 2px solid var(--color-ring);
   outline-offset: 2px;
 }
+
+/* ─── Dark Mode Theme ─── */
+.dark {
+  --color-background: hsl(240 10% 8%);
+  --color-foreground: hsl(38 25% 95%);
+  --color-card: hsl(240 10% 12%);
+  --color-card-foreground: hsl(38 25% 95%);
+  --color-popover: hsl(240 10% 12%);
+  --color-popover-foreground: hsl(38 25% 95%);
+  
+  --color-primary: hsl(27 91% 55%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  
+  --color-secondary: hsl(240 10% 18%);
+  --color-secondary-foreground: hsl(38 25% 90%);
+  --color-muted: hsl(240 10% 16%);
+  --color-muted-foreground: hsl(38 15% 65%);
+  
+  --color-accent: hsl(27 85% 60%);
+  --color-accent-foreground: hsl(0 0% 100%);
+  
+  --color-destructive: hsl(0 62% 48%);
+  --color-destructive-foreground: hsl(0 0% 100%);
+  
+  --color-success: hsl(145 55% 45%);
+  --color-success-foreground: hsl(0 0% 100%);
+  
+  --color-warning: hsl(38 90% 55%);
+  --color-warning-foreground: hsl(240 10% 10%);
+  --color-border: hsl(240 10% 22%);
+  --color-input: hsl(240 10% 22%);
+  --color-ring: hsl(27 91% 55%);
+  
+  /* Dark mode neomorphism */
+  --neo-bg: hsl(240 10% 12%);
+  --neo-shadow-light: hsl(240 10% 18%);
+  --neo-shadow-dark: hsl(240 12% 6%);
+}
+
+/* Dark mode neomorphism adjustments */
+.dark .neo-flat {
+  background: var(--neo-bg);
+  box-shadow:
+    8px 8px 18px 0 var(--neo-shadow-dark),
+    -8px -8px 18px 0 var(--neo-shadow-light);
+  border: 1px solid hsl(240 10% 18% / 0.6);
+}
+
+.dark .neo-pressed {
+  background: var(--neo-bg);
+  box-shadow:
+    inset 5px 5px 12px 0 var(--neo-shadow-dark),
+    inset -5px -5px 12px 0 var(--neo-shadow-light);
+  border: 1px solid hsl(240 10% 16% / 0.4);
+}
+
+.dark .neo-convex {
+  background: linear-gradient(145deg, hsl(240 10% 14%), hsl(240 10% 10%));
+  box-shadow:
+    6px 6px 14px 0 var(--neo-shadow-dark),
+    -6px -6px 14px 0 var(--neo-shadow-light);
+  border: 1px solid hsl(240 10% 18% / 0.5);
+}
+
+.dark .neo-concave {
+  background: linear-gradient(145deg, hsl(240 10% 10%), hsl(240 10% 14%));
+  box-shadow:
+    inset 6px 6px 14px 0 var(--neo-shadow-dark),
+    inset -6px -6px 14px 0 var(--neo-shadow-light);
+  border: 1px solid hsl(240 10% 16% / 0.4);
+}
+
+.dark .neo-card {
+  background: linear-gradient(145deg, hsl(240 10% 13%), hsl(240 10% 11%));
+  box-shadow:
+    10px 10px 20px 0 hsl(240 12% 6% / 0.8),
+    -10px -10px 20px 0 hsl(240 10% 18% / 0.4);
+  border: 1px solid hsl(240 10% 20% / 0.5);
+}
+
+.dark .neo-card-hover:hover {
+  box-shadow:
+    15px 15px 30px 0 hsl(240 12% 6% / 0.9),
+    -15px -15px 30px 0 hsl(240 10% 18% / 0.5);
+  transform: translateY(-2px);
+}
+
+.dark .neo-btn {
+  background: linear-gradient(145deg, hsl(240 10% 13%), hsl(240 10% 11%));
+  box-shadow:
+    5px 5px 12px 0 hsl(240 12% 6% / 0.7),
+    -5px -5px 12px 0 hsl(240 10% 18% / 0.35);
+  border: 1px solid hsl(240 10% 20% / 0.4);
+}
+
+.dark .neo-btn:hover {
+  box-shadow:
+    3px 3px 8px 0 hsl(240 12% 6% / 0.7),
+    -3px -3px 8px 0 hsl(240 10% 18% / 0.35);
+}
+
+.dark .neo-btn:active {
+  box-shadow:
+    inset 4px 4px 10px 0 var(--neo-shadow-dark),
+    inset -4px -4px 10px 0 var(--neo-shadow-light);
+}
+
+.dark .glass {
+  background: hsl(240 10% 12% / 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(240 10% 20% / 0.5);
+}
+
+.dark .glass-hover:hover {
+  background: hsl(240 10% 12% / 0.85);
+  backdrop-filter: blur(16px);
+}
+

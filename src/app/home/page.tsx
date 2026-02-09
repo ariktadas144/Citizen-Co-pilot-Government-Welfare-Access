@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
+import { calculateEligibility } from "@/lib/recommendation";
 import { Sparkles, ChevronRight, ChevronLeft } from "lucide-react";
 import { FeaturedSchemeCard } from "@/components/home/FeaturedSchemeCard";
 import { EligibleSchemeCard } from "@/components/home/EligibleSchemeCard";
@@ -24,6 +25,7 @@ interface Scheme {
   state: string | null;
   department: string | null;
   official_website: string | null;
+  eligibility_rules?: any;
   eligibility_score?: number;
 }
 
@@ -46,6 +48,20 @@ export default function HomePage() {
   async function fetchSchemes() {
     try {
       const supabase = createClient();
+      
+      // Get user profile for eligibility calculation
+      const { data: { user } } = await supabase.auth.getUser();
+      let userProfile = null;
+      
+      if (user) {
+        const { data: profile } = await supabase
+          .from("user_profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+        userProfile = profile;
+      }
+
       const { data: schemes } = await supabase
         .from("schemes")
         .select("*")
@@ -56,13 +72,31 @@ export default function HomePage() {
         // Top 5 featured
         setFeaturedSchemes(schemes.slice(0, 5));
         
-        // Simulated eligible schemes (top 6)
-        setEligibleSchemes(
-          schemes.slice(0, 6).map((s) => ({
-            ...s,
-            eligibility_score: Math.floor(Math.random() * 15) + 85,
-          }))
-        );
+        // Calculate real eligibility scores for user
+        if (userProfile) {
+          const schemesWithScores = schemes.map((scheme: Scheme) => {
+            const eligibility = calculateEligibility(userProfile, scheme.eligibility_rules || {});
+            return {
+              ...scheme,
+              eligibility_score: eligibility.score,
+            };
+          });
+          
+          // Sort by score and take top 6
+          const topEligible = schemesWithScores
+            .sort((a: Scheme, b: Scheme) => (b.eligibility_score || 0) - (a.eligibility_score || 0))
+            .slice(0, 6);
+          
+          setEligibleSchemes(topEligible);
+        } else {
+          // Guest user - show random schemes
+          setEligibleSchemes(
+            schemes.slice(0, 6).map((s: Scheme) => ({
+              ...s,
+              eligibility_score: Math.floor(Math.random() * 15) + 75,
+            }))
+          );
+        }
         
         // All remaining schemes
         setAllSchemes(schemes);

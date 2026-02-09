@@ -8,6 +8,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Camera, RotateCcw, CheckCircle2, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  loadFaceDetectionModels,
+  detectFaceOrientation,
+  validatePose,
+  cropToSquare,
+  type FaceDetectionResult,
+} from "@/lib/faceDetection";
 
 type Pose = "front" | "left" | "right";
 
@@ -29,96 +36,85 @@ const videoConstraints = {
 
 export default function FaceCapture({ onComplete }: FaceCaptureProps) {
   const webcamRef = useRef<Webcam>(null);
-  const animationFrameRef = useRef<number | undefined>(undefined);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [currentPoseIdx, setCurrentPoseIdx] = useState(0);
   const [capturedImages, setCapturedImages] = useState<Partial<Record<Pose, string>>>({});
   const [cameraError, setCameraError] = useState(false);
   const [faceDetected, setFaceDetected] = useState(false);
+  const [poseValid, setPoseValid] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [cameraReady, setCameraReady] = useState(false);
+  const [modelsLoading, setModelsLoading] = useState(true);
+  const [detectionResult, setDetectionResult] = useState<FaceDetectionResult | null>(null);
 
   const currentPose = POSES[currentPoseIdx];
   const progress = (Object.keys(capturedImages).length / POSES.length) * 100;
 
-  // Simple face detection using video brightness/motion
-  const detectFace = useCallback(() => {
-    if (!webcamRef.current || !canvasRef.current || !cameraReady) return;
+  // Load face detection models on mount
+  useEffect(() => {
+    loadFaceDetectionModels()
+      .then(() => {
+        setModelsLoading(false);
+        console.log("Face detection models ready");
+      })
+      .catch((error) => {
+        console.error("Failed to load face detection models:", error);
+        setModelsLoading(false);
+      });
+  }, []);
+
+  // Face detection with orientation validation
+  const detectFace = useCallback(async () => {
+    if (!webcamRef.current || !cameraReady || modelsLoading) return;
 
     const video = webcamRef.current.video;
     if (!video || video.readyState !== 4) return;
 
     try {
-      const canvas = canvasRef.current;
-      const context = canvas.getContext("2d", { willReadFrequently: true });
+      const result = await detectFaceOrientation(video);
+      setDetectionResult(result);
       
-      if (!context) return;
-
-      // Set canvas size to match video
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-
-      // Draw current video frame
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      // Get center region of the frame
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const regionSize = 100;
-
-      const imageData = context.getImageData(
-        centerX - regionSize / 2,
-        centerY - regionSize / 2,
-        regionSize,
-        regionSize
-      );
-
-      // Calculate average brightness
-      let totalBrightness = 0;
-      for (let i = 0; i < imageData.data.length; i += 4) {
-        const r = imageData.data[i];
-        const g = imageData.data[i + 1];
-        const b = imageData.data[i + 2];
-        const brightness = (r + g + b) / 3;
-        totalBrightness += brightness;
+      if (result.detected && result.orientation) {
+        const requiredPose = POSES[currentPoseIdx].key;
+        const isValidPose = validatePose(result.orientation, requiredPose);
+        
+        setFaceDetected(true);
+        setPoseValid(isValidPose);
+      } else {
+        setFaceDetected(false);
+        setPoseValid(false);
       }
 
-      const avgBrightness = totalBrightness / (regionSize * regionSize);
-
-      // Simple heuristic: if there's reasonable brightness in the center, assume face present
-      const detected = avgBrightness > 40 && avgBrightness < 220;
-      
-      setFaceDetected(detected);
-
-      animationFrameRef.current = requestAnimationFrame(detectFace);
+      // Continue detection loop
+      if (Object.keys(capturedImages).length < POSES.length) {
+        setTimeout(() => detectFace(), 100); // Check every 100ms
+      }
     } catch (error) {
       console.error("Face detection error:", error);
-      setFaceDetected(true);
+      setFaceDetected(false);
+      setPoseValid(false);
     }
-  }, [cameraReady]);
+  }, [cameraReady, modelsLoading, currentPoseIdx, capturedImages]);
 
-  // Start detection loop
+  // Start detection loop when camera is ready
   useEffect(() => {
-    if (!cameraReady || Object.keys(capturedImages).length === POSES.length) return;
+    if (!cameraReady || modelsLoading || Object.keys(capturedImages).length === POSES.length) return;
 
-    animationFrameRef.current = requestAnimationFrame(detectFace);
+    detectFace();
 
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
+      // Cleanup if needed
     };
-  }, [cameraReady, detectFace, capturedImages]);
+  }, [cameraReady, modelsLoading, detectFace, capturedImages]);
 
-  // Auto-capture countdown
+  // Auto-capture countdown when face is detected AND pose is valid
   useEffect(() => {
-    if (!faceDetected || Object.keys(capturedImages).length === POSES.length) {
+    if (!faceDetected || !poseValid || Object.keys(capturedImages).length === POSES.length) {
       setCountdown(0);
       return;
     }
 
-    let currentCount = 2;
+    let currentCount = 3;
     setCountdown(currentCount);
 
     const interval = setInterval(() => {
@@ -133,31 +129,52 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
 
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [faceDetected, currentPoseIdx, capturedImages]);
+  }, [faceDetected, poseValid, currentPoseIdx, capturedImages]);
 
-  const capture = useCallback(() => {
+  const capture = useCallback(async () => {
     const imageSrc = webcamRef.current?.getScreenshot();
-    if (!imageSrc) return;
+    if (!imageSrc || !detectionResult?.boundingBox) return;
 
-    const pose = POSES[currentPoseIdx].key;
-    const next = { ...capturedImages, [pose]: imageSrc };
-    setCapturedImages(next);
+    try {
+      // Crop to square centered on face
+      const croppedImage = await cropToSquare(imageSrc, detectionResult.boundingBox, 0.6);
+      
+      const pose = POSES[currentPoseIdx].key;
+      const next = { ...capturedImages, [pose]: croppedImage };
+      setCapturedImages(next);
 
-    setFaceDetected(false);
-    setCountdown(0);
+      setFaceDetected(false);
+      setPoseValid(false);
+      setCountdown(0);
+      setDetectionResult(null);
 
-    if (currentPoseIdx < POSES.length - 1) {
-      setCurrentPoseIdx((i) => i + 1);
-    } else {
-      onComplete(next as Record<Pose, string>);
+      if (currentPoseIdx < POSES.length - 1) {
+        setCurrentPoseIdx((i) => i + 1);
+      } else {
+        onComplete(next as Record<Pose, string>);
+      }
+    } catch (error) {
+      console.error("Error cropping image:", error);
+      // Fallback: use original image if cropping fails
+      const pose = POSES[currentPoseIdx].key;
+      const next = { ...capturedImages, [pose]: imageSrc };
+      setCapturedImages(next);
+
+      if (currentPoseIdx < POSES.length - 1) {
+        setCurrentPoseIdx((i) => i + 1);
+      } else {
+        onComplete(next as Record<Pose, string>);
+      }
     }
-  }, [currentPoseIdx, capturedImages, onComplete]);
+  }, [currentPoseIdx, capturedImages, detectionResult, onComplete]);
 
   const retake = () => {
     setCapturedImages({});
     setCurrentPoseIdx(0);
     setFaceDetected(false);
+    setPoseValid(false);
     setCountdown(0);
+    setDetectionResult(null);
   };
 
   const handleUserMedia = () => {
@@ -243,33 +260,32 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
                 className="rounded-2xl"
                 mirrored
               />
-              
-              <canvas ref={canvasRef} className="hidden" />
-
               {/* Animated Circle Overlay */}
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                 <motion.div
                   animate={{
-                    borderColor: faceDetected ? "#22c55e" : "#ef4444",
-                    scale: faceDetected ? [1, 1.02, 1] : 1,
+                    borderColor: faceDetected && poseValid ? "#22c55e" : faceDetected ? "#f59e0b" : "#ef4444",
+                    scale: faceDetected && poseValid ? [1, 1.02, 1] : 1,
                   }}
                   transition={{ 
-                    duration: faceDetected ? 1 : 0.3,
-                    repeat: faceDetected ? Infinity : 0 
+                    duration: faceDetected && poseValid ? 1 : 0.3,
+                    repeat: faceDetected && poseValid ? Infinity : 0 
                   }}
                   className="h-72 w-72 rounded-full border-4"
                   style={{
-                    borderColor: faceDetected ? "#22c55e" : "#ef4444",
-                    boxShadow: faceDetected
+                    borderColor: faceDetected && poseValid ? "#22c55e" : faceDetected ? "#f59e0b" : "#ef4444",
+                    boxShadow: faceDetected && poseValid
                       ? "0 0 30px rgba(34, 197, 94, 0.6), inset 0 0 20px rgba(34, 197, 94, 0.1)"
-                      : "0 0 30px rgba(239, 68, 68, 0.6), inset 0 0 20px rgba(239, 68, 68, 0.1)",
+                      : faceDetected
+                        ? "0 0 30px rgba(245, 158, 11, 0.6), inset 0 0 20px rgba(245, 158, 11, 0.1)"
+                        : "0 0 30px rgba(239, 68, 68, 0.6), inset 0 0 20px rgba(239, 68, 68, 0.1)",
                   }}
                 />
               </div>
 
               {/* Countdown */}
               <AnimatePresence>
-                {faceDetected && countdown > 0 && (
+                {faceDetected && poseValid && countdown > 0 && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -294,15 +310,25 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
                   animate={{ 
                     y: 0, 
                     opacity: 1,
-                    backgroundColor: faceDetected ? "#22c55e" : "#ef4444",
+                    backgroundColor: faceDetected && poseValid ? "#22c55e" : faceDetected ? "#f59e0b" : "#ef4444",
                   }}
                   transition={{ duration: 0.3 }}
                   className="px-6 py-2 rounded-full text-white font-semibold text-sm shadow-lg backdrop-blur-sm flex items-center gap-2"
                 >
-                  {faceDetected ? (
+                  {modelsLoading ? (
+                    <>
+                      <AlertCircle className="w-4 h-4 animate-spin" />
+                      Loading AI Models...
+                    </>
+                  ) : faceDetected && poseValid ? (
                     <>
                       <CheckCircle2 className="w-4 h-4" />
-                      Face Detected
+                      Perfect! Hold still...
+                    </>
+                  ) : faceDetected ? (
+                    <>
+                      <AlertCircle className="w-4 h-4" />
+                      Adjust head position
                     </>
                   ) : (
                     <>
@@ -358,9 +384,19 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
           >
             <p className="font-semibold text-lg text-primary">{currentPose.instruction}</p>
             <p className="text-sm text-muted-foreground">
-              Position your face within the circle. Auto-capture activates when face is detected for 2 seconds.
+              Position your face within the circle and turn your head as instructed. 
+              Auto-capture activates when correct orientation is detected for 3 seconds.
             </p>
-            {!cameraReady && (
+            {modelsLoading && (
+              <motion.p 
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="text-xs text-orange-600 font-medium"
+              >
+                Loading face detection AI models...
+              </motion.p>
+            )}
+            {!cameraReady && !modelsLoading && (
               <motion.p 
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 1.5, repeat: Infinity }}

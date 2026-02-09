@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -16,16 +17,27 @@ import {
   Briefcase,
   IndianRupee,
   LogOut,
-  ArrowLeft,
   CheckCircle2,
   XCircle,
+  Edit2,
+  Save,
+  X as XIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import "@/lib/i18n";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
+import { ChatbotButton } from "@/components/ChatbotButton";
 import type { UserProfile } from "../../../types/user";
 
 export default function ProfilePage() {
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [editedProfile, setEditedProfile] = useState<Partial<UserProfile>>({});
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -47,7 +59,10 @@ export default function ProfilePage() {
         .eq("id", user.id)
         .single();
 
-      if (data) setProfile(data);
+      if (data) {
+        setProfile(data);
+        setEditedProfile(data);
+      }
     } catch (error) {
       console.error("Failed to fetch profile:", error);
     } finally {
@@ -58,6 +73,37 @@ export default function ProfilePage() {
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      const response = await fetch("/api/profile/update", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editedProfile),
+      });
+
+      if (response.ok) {
+        const { data } = await response.json();
+        setProfile(data);
+        setEditing(false);
+      } else {
+        const { error } = await response.json();
+        console.error("Failed to update profile:", error);
+        alert("Failed to update profile. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleCancel() {
+    setEditedProfile(profile || {});
+    setEditing(false);
+  }
 
   async function handleLogout() {
     const supabase = createClient();
@@ -85,241 +131,372 @@ export default function ProfilePage() {
     .join("")
     .toUpperCase() || "U";
 
+  const InfoField = ({
+    icon: Icon,
+    label,
+    value,
+    field,
+    type = "text",
+  }: {
+    icon: any;
+    label: string;
+    value: string | number | null;
+    field: keyof UserProfile;
+    type?: string;
+  }) => {
+    // Get the field value and convert to string for input
+    const fieldValue = editedProfile[field];
+    const stringValue = fieldValue != null && typeof fieldValue !== 'object' && typeof fieldValue !== 'boolean' && !Array.isArray(fieldValue)
+      ? String(fieldValue)
+      : "";
+
+    return (
+      <div className="space-y-2">
+        <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+          <Icon className="h-4 w-4 text-primary" />
+          {label}
+        </Label>
+        {editing ? (
+          <Input
+            type={type}
+            value={stringValue}
+            onChange={(e) =>
+              setEditedProfile({ ...editedProfile, [field]: e.target.value })
+            }
+            className="neo-pressed border-0 focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
+          />
+        ) : (
+          <p className="text-foreground font-medium pl-6">
+            {value || "Not provided"}
+          </p>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
-        <div className="container max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => router.back()}
-                className="rounded-full"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <h1 className="text-2xl font-bold">My Profile</h1>
-            </div>
+      <Header />
+
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 text-white py-12">
+        <div className="container max-w-4xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-between"
+          >
+            <h1 className="text-4xl font-bold">
+              {t("profile.title") || "My Profile"}
+            </h1>
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={handleLogout}
-              className="flex items-center gap-2 text-destructive hover:bg-destructive/10"
+              className="flex items-center gap-2 text-white hover:bg-white/20 rounded-xl"
             >
               <LogOut className="h-4 w-4" />
-              Logout
+              {t("common.logout") || "Logout"}
             </Button>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </section>
 
       {/* Content */}
       <div className="container max-w-4xl mx-auto px-4 py-8 space-y-6">
         {/* Profile Header Card */}
-        <Card className="border-2">
-          <CardContent className="pt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="neo-flat rounded-2xl p-8"
+        >
+          <div className="flex items-start justify-between mb-6">
             <div className="flex items-start gap-6">
-              <Avatar className="h-24 w-24 border-4 border-primary">
-                <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
+              <motion.div whileHover={{ scale: 1.05 }} className="relative">
+                <Avatar className="h-24 w-24 border-4 border-primary neo-flat">
+                  <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-green-500 border-4 border-background" />
+              </motion.div>
               <div className="flex-1">
-                <h2 className="text-3xl font-bold mb-2">{profile.full_name || "User"}</h2>
-                <p className="text-muted-foreground mb-4">{profile.email}</p>
+                <h2 className="text-3xl font-bold mb-2">
+                  {profile.full_name || "User"}
+                </h2>
+                <p className="text-muted-foreground mb-4 flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  {profile.email}
+                </p>
                 <div className="flex gap-3 flex-wrap">
                   <Badge
-                    variant={profile.id_verified ? "default" : "secondary"}
-                    className="flex items-center gap-1"
+                    className={`neo-flat border-0 ${
+                      profile.id_verified
+                        ? "bg-green-600 text-white"
+                        : "bg-muted text-muted-foreground"
+                    }`}
                   >
                     {profile.id_verified ? (
-                      <CheckCircle2 className="h-3 w-3" />
+                      <CheckCircle2 className="h-3 w-3 mr-1" />
                     ) : (
-                      <XCircle className="h-3 w-3" />
+                      <XCircle className="h-3 w-3 mr-1" />
                     )}
                     ID {profile.id_verified ? "Verified" : "Not Verified"}
                   </Badge>
                   <Badge
-                    variant={profile.face_verified ? "default" : "secondary"}
-                    className="flex items-center gap-1"
+                    className={`neo-flat border-0 ${
+                      profile.face_verified
+                        ? "bg-green-600 text-white"
+                        : "bg-muted text-muted-foreground"
+                    }`}
                   >
                     {profile.face_verified ? (
-                      <CheckCircle2 className="h-3 w-3" />
+                      <CheckCircle2 className="h-3 w-3 mr-1" />
                     ) : (
-                      <XCircle className="h-3 w-3" />
+                      <XCircle className="h-3 w-3 mr-1" />
                     )}
                     Face {profile.face_verified ? "Verified" : "Not Verified"}
                   </Badge>
                   <Badge
-                    variant={profile.onboarding_completed ? "default" : "secondary"}
-                    className="flex items-center gap-1"
+                    className={`neo-flat border-0 ${
+                      profile.onboarding_completed
+                        ? "bg-green-600 text-white"
+                        : "bg-muted text-muted-foreground"
+                    }`}
                   >
                     {profile.onboarding_completed ? (
-                      <CheckCircle2 className="h-3 w-3" />
+                      <CheckCircle2 className="h-3 w-3 mr-1" />
                     ) : (
-                      <XCircle className="h-3 w-3" />
+                      <XCircle className="h-3 w-3 mr-1" />
                     )}
-                    Onboarding {profile.onboarding_completed ? "Complete" : "Pending"}
+                    Onboarding{" "}
+                    {profile.onboarding_completed ? "Complete" : "Pending"}
                   </Badge>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Edit Button */}
+            <AnimatePresence mode="wait">
+              {!editing ? (
+                <motion.div
+                  key="edit"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                >
+                  <Button
+                    onClick={() => setEditing(true)}
+                    className="neo-flat hover:neo-pressed rounded-xl bg-primary text-primary-foreground"
+                  >
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="actions"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="flex gap-2"
+                >
+                  <Button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="neo-flat hover:neo-pressed rounded-xl bg-green-600 text-white"
+                  >
+                    <Save className="h-4 w-4
+
+ mr-2" />
+                    {saving ? "Saving..." : "Save"}
+                  </Button>
+                  <Button
+                    onClick={handleCancel}
+                    variant="ghost"
+                    className="neo-flat hover:neo-pressed rounded-xl"
+                  >
+                    <XIcon className="h-4 w-4 mr-2" />
+                    Cancel
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
 
         {/* Personal Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5 text-primary" />
-              Personal Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InfoItem
-                icon={<Mail className="h-4 w-4" />}
-                label="Email"
-                value={profile.email}
-              />
-              <InfoItem
-                icon={<Phone className="h-4 w-4" />}
-                label="Phone"
-                value={profile.phone || "Not provided"}
-              />
-              <InfoItem
-                icon={<Calendar className="h-4 w-4" />}
-                label="Date of Birth"
-                value={
-                  profile.date_of_birth
-                    ? new Date(profile.date_of_birth).toLocaleDateString("en-IN")
-                    : "Not provided"
-                }
-              />
-              <InfoItem
-                icon={<User className="h-4 w-4" />}
-                label="Gender"
-                value={profile.gender || "Not provided"}
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="neo-flat rounded-2xl p-6"
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <User className="h-5 w-5 text-primary" />
+            <h3 className="text-xl font-bold">Personal Information</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InfoField
+              icon={User}
+              label="Full Name"
+              value={profile.full_name}
+              field="full_name"
+            />
+            <InfoField
+              icon={Phone}
+              label="Phone"
+              value={profile.phone}
+              field="phone"
+              type="tel"
+            />
+            <InfoField
+              icon={Calendar}
+              label="Date of Birth"
+              value={profile.date_of_birth}
+              field="date_of_birth"
+            />
+            <InfoField
+              icon={User}
+              label="Gender"
+              value={profile.gender}
+              field="gender"
+            />
+          </div>
+        </motion.div>
 
         {/* Address */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-primary" />
-              Address
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InfoItem
-                label="State"
-                value={profile.state || "Not provided"}
-              />
-              <InfoItem
-                label="District"
-                value={profile.address?.district || "Not provided"}
-              />
-              <div className="md:col-span-2">
-                <InfoItem
-                  label="Address Line"
-                  value={profile.address?.line1 || "Not provided"}
-                />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="neo-flat rounded-2xl p-6"
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <MapPin className="h-5 w-5 text-primary" />
+            <h3 className="text-xl font-bold">Address</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  Address
+                </Label>
+                <p className="text-foreground font-medium pl-6">
+                  {profile.address?.line1 || profile.address?.line2
+                    ? `${profile.address.line1 || ""} ${profile.address.line2 || ""}`.trim()
+                    : "Not provided"}
+                </p>
               </div>
-              <InfoItem
-                label="Pincode"
-                value={profile.address?.pincode || "Not provided"}
-              />
             </div>
-          </CardContent>
-        </Card>
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <MapPin className="h-4 w-4 text-primary" />
+                District
+              </Label>
+              <p className="text-foreground font-medium pl-6">
+                {profile.address?.district || "Not provided"}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <MapPin className="h-4 w-4 text-primary" />
+                State
+              </Label>
+              <p className="text-foreground font-medium pl-6">
+                {profile.address?.state || profile.state || "Not provided"}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <MapPin className="h-4 w-4 text-primary" />
+                Pincode
+              </Label>
+              <p className="text-foreground font-medium pl-6">
+                {profile.address?.pincode || "Not provided"}
+              </p>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Additional Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              Additional Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InfoItem
-                icon={<Briefcase className="h-4 w-4" />}
-                label="Occupation"
-                value={profile.occupation || "Not provided"}
-              />
-              <InfoItem
-                icon={<IndianRupee className="h-4 w-4" />}
-                label="Annual Income"
-                value={
-                  profile.annual_income
-                    ? `₹${profile.annual_income.toLocaleString("en-IN")}`
-                    : "Not provided"
-                }
-              />
-              <InfoItem
-                label="Caste Category"
-                value={profile.caste_category || "Not provided"}
-              />
-              <InfoItem
-                label="Disability Status"
-                value={profile.disability_status || "None"}
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="neo-flat rounded-2xl p-6"
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <Briefcase className="h-5 w-5 text-primary" />
+            <h3 className="text-xl font-bold">Additional Details</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InfoField
+              icon={Briefcase}
+              label="Occupation"
+              value={profile.occupation}
+              field="occupation"
+            />
+            <InfoField
+              icon={IndianRupee}
+              label="Annual Income (₹)"
+              value={profile.annual_income}
+              field="annual_income"
+              type="number"
+            />
+            <InfoField
+              icon={Shield}
+              label="Caste Category"
+              value={profile.caste_category}
+              field="caste_category"
+            />
+            <InfoField
+              icon={Shield}
+              label="Disability Status"
+              value={profile.disability_status}
+              field="disability_status"
+            />
+          </div>
+        </motion.div>
 
-        {/* ID Documents */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              Identity Documents
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InfoItem
-                label="Aadhaar Number"
-                value={
-                  profile.aadhaar_number
-                    ? `XXXX XXXX ${profile.aadhaar_number.slice(-4)}`
-                    : "Not provided"
-                }
-              />
-              <InfoItem
-                label="Voter ID"
-                value={profile.voter_id || "Not provided"}
-              />
+        {/* Identity Documents */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="neo-flat rounded-2xl p-6"
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <Shield className="h-5 w-5 text-primary" />
+            <h3 className="text-xl font-bold">Identity Documents</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground mb-2">
+                <Shield className="h-4 w-4 text-primary" />
+                Aadhaar Number
+              </Label>
+              <p className="text-foreground font-medium pl-6">
+                {profile.aadhaar_number
+                  ? `XXXX XXXX ${profile.aadhaar_number.slice(-4)}`
+                  : "Not provided"}
+              </p>
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground mb-2">
+                <Shield className="h-4 w-4 text-primary" />
+                Voter ID
+              </Label>
+              <p className="text-foreground font-medium pl-6">
+                {profile.voter_id || "Not provided"}
+              </p>
+            </div>
+          </div>
+        </motion.div>
       </div>
-    </div>
-  );
-}
 
-function InfoItem({
-  icon,
-  label,
-  value,
-}: {
-  icon?: React.ReactNode;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        {icon}
-        <span>{label}</span>
-      </div>
-      <p className="font-medium capitalize">{value}</p>
+      <Footer />
+      <ChatbotButton />
     </div>
   );
 }

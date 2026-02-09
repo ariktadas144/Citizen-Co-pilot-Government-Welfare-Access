@@ -34,29 +34,6 @@ const resources = {
       "common.keyBenefit": "Key Benefit",
       "common.match": "Match",
       "common.loading": "Loading...",
-    },
-  },
-  hi: {
-    translation: {
-      "hero.badge": "नागरिक कल्याण पोर्टल",
-      "hero.title": "योजनाएं खोजें",
-      "hero.subtitle": "आपके लिए बनाई गई",
-      "hero.description":
-        "अपनी प्रोफ़ाइल के अनुरूप सरकारी कल्याण कार्यक्रमों से जुड़ें। सरल पहुंच, सत्यापित पात्रता, सहज आवेदन।",
-      "hero.cta": "योजनाएं देखें",
-      "featured.title": "विशेष योजनाएं",
-      "featured.subtitle": "अधिकतम प्रभाव वाले चुनिंदा कार्यक्रम",
-      "eligible.title": "आप पात्र हैं",
-      "eligible.subtitle":
-        "आपकी प्रोफ़ाइल के आधार पर, ये योजनाएं आपकी पात्रता से मेल खाती हैं",
-      "all.title": "सभी योजनाएं",
-      "all.subtitle": "सभी उपलब्ध सरकारी कल्याण कार्यक्रम ब्राउज़ करें",
-      "common.viewDetails": "विवरण देखें",
-      "common.applyNow": "अभी आवेदन करें",
-      "common.benefits": "लाभ",
-      "common.keyBenefit": "Key Benefit",
-      "common.match": "Match",
-      "common.loading": "Loading...",
       "common.logout": "Logout",
 
       // Navigation
@@ -98,11 +75,91 @@ const resources = {
       "chatbot.women": "We have dedicated women empowerment schemes covering financial assistance, skill training, and entrepreneurship support. Let me help you find the right one!",
       "chatbot.eligibility": "To check your eligibility, I'll need some basic information. Have you completed your profile? You can also browse schemes and see your eligibility score for each one!",
       "chatbot.default": "I understand you're looking for information about government schemes. Could you please tell me more about your specific needs or the category you're interested in? (Education, Health, Agriculture, Women Welfare, etc.)",
-      "chatbot.findSchemes": "Find Schemes",
-      "chatbot.checkEligibility": "Check Eligibility",
-      "chatbot.howToApply": "How to Apply",
-      "chatbot.trackApplication": "Track Application",
-      "chatbot.placeholder": "Type your message...",
+
+      // Profile
+      "profile.title": "My Profile",
+
+      // Schemes
+      "schemes.title": "All Schemes",
+      "schemes.subtitle": "Browse through all available government and private welfare schemes",
+      "schemes.search": "Search schemes...",
+    },
+  },
+  hi: {
+    translation: {
+      "hero.badge": "नागरिक कल्याण पोर्टल",
+      "hero.title": "योजनाएं खोजें",
+      "hero.subtitle": "आपके लिए बनाई गई",
+      "hero.description":
+        "अपनी प्रोफ़ाइल के अनुरूप सरकारी कल्याण कार्यक्रमों से जुड़ें। सरल पहुंच, सत्यापित पात्रता, सहज आवेदन।",
+      "hero.cta": "योजनाएं देखें",
+      "featured.title": "विशेष योजनाएं",
+      "featured.subtitle": "अधिकतम प्रभाव वाले चुनिंदा कार्यक्रम",
+      "eligible.title": "आप पात्र हैं",
+      "eligible.subtitle":
+        "आपकी प्रोफ़ाइल के आधार पर, ये योजनाएं आपकी पात्रता से मेल खाती हैं",
+      "all.title": "सभी योजनाएं",
+      "all.subtitle": "सभी उपलब्ध सरकारी कल्याण कार्यक्रम ब्राउज़ करें",
+      "common.viewDetails": "विवरण देखें",
+      "common.applyNow": "अभी आवेदन करें",
+      "common.benefits": "लाभ",
+      "common.keyBenefit": "मुख्य लाभ",
+      "common.match": "मिलान",
+      "common.loading": "लोड हो रहा है...",
+      "common.logout": "लॉगआउट",
+
+      // Navigation
+      "nav.home": "होम",
+      "nav.schemes": "योजनाएं",
+      "nav.help": "सहायता",
+
+      // Header
+      "header.tagline": "नागरिकों को सशक्त बनाना",
+
+      // Footer
+      "footer.tagline": "देशभर के नागरिकों को सशक्त बनाना",
+      "footer.description": "अपनी प्रोफ़ाइल के अनुरूप सरकारी कल्याण कार्यक्रमों से जुड़ें। सरल पहुंच, सत्यापित पात्रता, सहज आवेदन।",
+      "footer.quickLinks": "त्वरित लिंक",
+      "footer.home": "होम",
+      "footer.allSchemes": "सभी योजनाएं",
+      "footer.myProfile": "मेरी प्रोफ़ाइल",
+      "footer.myApplications": "मेरे आवेदन",
+      "footer.categories": "श्रेणियाँ",
+      "footer.education": "शिक्षा",
+      "footer.health": "स्वास्थ्य",
+      "footer.agriculture": "कृषि",
+      "footer.women": "महिला कल्याण",
+      "footer.support": "सहायता",
+      "footer.help": "सहायता केंद्र",
+      "footer.faq": "FAQ",
+      "footer.contact": "संपर्क करें",
+      "footer.privacy": "गोपनीयता नीति",
+      "footer.rights": "सर्वाधिकार सुरक्षित।",
+      "footer.govtIndia": "भारत सरकार",
+
+      // Chatbot
+      "chatbot.title": "योजना सहायक",
+      "chatbot.status": "ऑनलाइन • मदद के लिए तैयार",
+      "chatbot.welcome": "नमस्ते! मैं यहां आपको सही सरकारी योजना खोजने में मदद करने के लिए हूं। आज मैं आपकी कैसे सहायता कर सकता हूं?",
+      "chatbot.education": "मैं आपको शैक्षिक योजनाओं में मदद कर सकता हूं! हमारे पास छात्रवृत्ति, कौशल विकास कार्यक्रम और छात्र कल्याण योजनाएं हैं।",
+      "chatbot.health": "मुझे कई स्वास्थ्य संबंधित योजनाएं मिलीं! इनमें स्वास्थ्य बीमा, चिकित्सा सहायता और कल्याण कार्यक्रम शामिल हैं।",
+      "chatbot.agriculture": "बढ़िया! हमारे पास कृषि और किसान कल्याण योजनाएं हैं जिनमें फसल बीमा, सब्सिडी और उपकरण सहायता शामिल है।",
+      "chatbot.women": "हमारे पास महिला सशक्तिकरण योजनाएं हैं जिनमें वित्तीय सहायता, कौशल प्रशिक्षण और उद्यमिता समर्थन शामिल है।",
+      "chatbot.eligibility": "आपकी पात्रता जांचने के लिए, मुझे कुछ बुनियादी जानकारी चाहिए। क्या आपने अपनी प्रोफ़ाइल पूरी कर ली है?",
+      "chatbot.default": "मैं समझता हूं कि आप सरकारी योजनाओं के बारे में जानकारी ढूंढ रहे हैं। कृपया मुझे अपनी विशिष्ट आवश्यकताओं के बारे में बताएं।",
+      "chatbot.findSchemes": "योजनाएं खोजें",
+      "chatbot.checkEligibility": "पात्रता जांचें",
+      "chatbot.howToApply": "कैसे आवेदन करें",
+      "chatbot.trackApplication": "आवेदन ट्रैक करें",
+      "chatbot.placeholder": "अपना संदेश टाइप करें...",
+
+      // Profile
+      "profile.title": "मेरी प्रोफ़ाइल",
+
+      // Schemes
+      "schemes.title": "सभी योजनाएं",
+      "schemes.subtitle": "सभी उपलब्ध सरकारी और निजी कल्याण योजनाएं ब्राउज़ करें",
+      "schemes.search": "योजनाएं खोजें...",
     },
   },
   ta: {
@@ -245,15 +302,18 @@ const resources = {
   },
 };
 
-i18n
-  .use(initReactI18next)
-  .init({
-    resources,
-    lng: "en",
-    fallbackLng: "en",
-    interpolation: {
-      escapeValue: false,
-    },
-  });
+// Initialize i18n synchronously
+if (!i18n.isInitialized) {
+  i18n
+    .use(initReactI18next)
+    .init({
+      resources,
+      lng: "en",
+      fallbackLng: "en",
+      interpolation: {
+        escapeValue: false,
+      },
+    });
+}
 
 export default i18n;

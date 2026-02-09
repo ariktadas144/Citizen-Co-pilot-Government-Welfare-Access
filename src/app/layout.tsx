@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import ConvexClientProvider from "@/components/providers/ConvexProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { I18nProvider } from "@/components/providers/I18nProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,21 +30,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <ConvexClientProvider>
-          {children}
-        </ConvexClientProvider>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: "var(--color-card)",
-              color: "var(--color-card-foreground)",
-              border: "1px solid var(--color-border)",
-            },
-          }}
-        />
+        <I18nProvider>
+          <ThemeProvider>
+            <ConvexClientProvider>
+              {children}
+            </ConvexClientProvider>
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                style: {
+                  background: "var(--color-card)",
+                  color: "var(--color-card-foreground)",
+                  border: "1px solid var(--color-border)",
+                },
+              }}
+            />
+          </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   );

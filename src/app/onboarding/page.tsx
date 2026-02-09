@@ -36,8 +36,8 @@ import {
 } from "lucide-react";
 
 const STEPS = [
-  { title: "Upload ID", icon: FileUp },
-  { title: "Review Details", icon: User },
+  // { title: "Upload ID", icon: FileUp }, // Disabled - ID upload is now optional
+  { title: "Personal Details", icon: User },
   { title: "Additional Info", icon: Shield },
   { title: "Face Verification", icon: Camera },
   { title: "Interests", icon: Tags },
@@ -80,14 +80,14 @@ interface OcrData {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(0); // Start at step 0 (Personal Details, since we removed ID upload)
   const [loading, setLoading] = useState(false);
 
-  // Step 1: Document upload
+  // Step 1: Document upload (DISABLED - now optional)
   const [file, setFile] = useState<File | null>(null);
   const [docType, setDocType] = useState("aadhaar");
 
-  // Step 2: OCR data review
+  // Step 2: OCR data review (now manual entry)
   const [ocrData, setOcrData] = useState<OcrData | null>(null);
   const [editedData, setEditedData] = useState({
     full_name: "",
@@ -142,21 +142,21 @@ export default function OnboardingPage() {
     }
   };
 
-  // Step 2 → Step 3
-  const handleReviewConfirm = () => {
+  // Step 0 → Step 1 (Personal Details → Additional Info)
+  const handleDetailsReview = () => {
     if (!editedData.full_name || !editedData.date_of_birth || !editedData.gender) {
       toast.error("Please fill in all required fields.");
       return;
     }
-    setStep(2);
+    setStep(1); // Move to Additional Info (step 1)
   };
 
-  // Step 3 → Step 4
+  // Step 1 → Step 2 (Additional Info → Face Verification)
   const handleAdditionalInfo = () => {
-    setStep(3);
+    setStep(2); // Move to Face Verification (step 2)
   };
 
-  // Step 4: Face capture → Step 5
+  // Step 2: Face capture → Step 3 (Face Verification → Interests)
   const handleFaceComplete = useCallback(
     async (images: Record<"front" | "left" | "right", string>) => {
       setLoading(true);
@@ -173,7 +173,7 @@ export default function OnboardingPage() {
         }
 
         toast.success("Face verified! Your front photo is now your profile picture.");
-        setStep(4); // Go to interest tags step
+        setStep(3); // Go to interest tags step (now step 3 instead of 4)
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Something went wrong";
         toast.error(message);
@@ -272,72 +272,13 @@ export default function OnboardingPage() {
           </div>
         </div>
 
-        {/* Step 1: Upload */}
+        {/* Step 0: Personal Details (was Step 1: Review Details) */}
         {step === 0 && (
           <Card className="neo-card">
             <CardHeader>
-              <CardTitle>Upload Your ID Document</CardTitle>
+              <CardTitle>Personal Details</CardTitle>
               <CardDescription>
-                We&apos;ll use AI to extract your details automatically.
-                Supported: Aadhaar, Voter ID, or other government IDs.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Document Type</Label>
-                <Select value={docType} onValueChange={setDocType}>
-                  <SelectTrigger className="neo-input">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="aadhaar">Aadhaar Card</SelectItem>
-                    <SelectItem value="voter_id">Voter ID</SelectItem>
-                    <SelectItem value="other">Other Government ID</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Upload Document</Label>
-                <div className="flex items-center gap-3">
-                  <Input
-                    type="file"
-                    accept="image/*,.pdf"
-                    onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    className="neo-input"
-                  />
-                </div>
-                {file && (
-                  <p className="text-sm text-muted-foreground">
-                    Selected: {file.name} ({(file.size / 1024).toFixed(0)} KB)
-                  </p>
-                )}
-              </div>
-
-              <Button
-                onClick={handleUpload}
-                disabled={!file || loading}
-                className="w-full neo-btn"
-                size="lg"
-              >
-                {loading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <FileUp className="mr-2 h-4 w-4" />
-                )}
-                {loading ? "Scanning Document..." : "Scan & Extract"}
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step 2: Review OCR Data */}
-        {step === 1 && (
-          <Card className="neo-card">
-            <CardHeader>
-              <CardTitle>Review Extracted Details</CardTitle>
-              <CardDescription>
-                Please verify and correct the information extracted from your document.
+                Please enter your personal information. All fields marked with * are required.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -410,12 +351,9 @@ export default function OnboardingPage() {
                 </Select>
               </div>
 
-              <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(0)}>
-                  <ArrowLeft className="mr-2 h-4 w-4" /> Back
-                </Button>
-                <Button onClick={handleReviewConfirm} className="flex-1 neo-btn">
-                  Confirm & Continue
+              <div className="flex justify-end">
+                <Button onClick={handleDetailsReview} className="neo-btn">
+                  Continue to Additional Info
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
@@ -423,8 +361,8 @@ export default function OnboardingPage() {
           </Card>
         )}
 
-        {/* Step 3: Additional Profile */}
-        {step === 2 && (
+        {/* Step 1: Additional Profile */}
+        {step === 1 && (
           <Card className="neo-card">
             <CardHeader>
               <CardTitle>Additional Information</CardTitle>
@@ -512,7 +450,7 @@ export default function OnboardingPage() {
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(1)}>
+                <Button variant="outline" onClick={() => setStep(0)}>
                   <ArrowLeft className="mr-2 h-4 w-4" /> Back
                 </Button>
                 <Button onClick={handleAdditionalInfo} className="flex-1 neo-btn">
@@ -524,8 +462,8 @@ export default function OnboardingPage() {
           </Card>
         )}
 
-        {/* Step 4: Face Capture */}
-        {step === 3 && (
+        {/* Step 2: Face Capture */}
+        {step === 2 && (
           <div className="space-y-4">
             {loading && (
               <div className="flex items-center justify-center gap-2 rounded-lg bg-primary/10 p-4 text-primary">
@@ -534,14 +472,14 @@ export default function OnboardingPage() {
               </div>
             )}
             <FaceCapture onComplete={handleFaceComplete} />
-            <Button variant="outline" onClick={() => setStep(2)} disabled={loading}>
+            <Button variant="outline" onClick={() => setStep(1)} disabled={loading}>
               <ArrowLeft className="mr-2 h-4 w-4" /> Back
             </Button>
           </div>
         )}
 
-        {/* Step 5: Interest Tags */}
-        {step === 4 && (
+        {/* Step 3: Interest Tags */}
+        {step === 3 && (
           <Card className="neo-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -592,7 +530,7 @@ export default function OnboardingPage() {
               )}
 
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(3)}>
+                <Button variant="outline" onClick={() => setStep(2)}>
                   <ArrowLeft className="mr-2 h-4 w-4" /> Back
                 </Button>
                 <Button

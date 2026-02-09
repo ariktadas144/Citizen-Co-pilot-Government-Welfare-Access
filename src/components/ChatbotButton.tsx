@@ -6,6 +6,7 @@ import { MessageCircle, X, Send, Bot, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "react-i18next";
+import "@/lib/i18n";
 
 export function ChatbotButton() {
   const { t } = useTranslation();

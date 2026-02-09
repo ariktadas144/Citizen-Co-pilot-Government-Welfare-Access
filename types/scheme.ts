@@ -27,6 +27,7 @@ export interface Scheme {
   category: string;
   icon: string | null;
   created_by: string | null; // user id or org id
+  scheme_type: 'government' | 'private'; // government = redirect, private = our form
   created_at: string;
   updated_at: string;
 }

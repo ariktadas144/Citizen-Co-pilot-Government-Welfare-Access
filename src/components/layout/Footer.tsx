@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Sparkles, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import "@/lib/i18n";
 import Link from "next/link";
 
 export function Footer() {

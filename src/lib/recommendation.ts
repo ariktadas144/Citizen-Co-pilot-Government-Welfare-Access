@@ -188,3 +188,11 @@ export function getSchemeRecommendations(
     })
     .sort((a, b) => b.eligibility_score - a.eligibility_score);
 }
+
+// Export calculateEligibility for individual scheme checking
+export function calculateEligibility(
+  user: UserProfile,
+  rules: EligibilityRules
+): { matched: string[]; missing: string[]; score: number } {
+  return checkCriteria(user, rules);
+}
