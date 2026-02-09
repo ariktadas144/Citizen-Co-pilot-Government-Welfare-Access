@@ -158,14 +158,14 @@ export default function OnboardingPage() {
 
   // Step 2: Face capture → Step 3 (Face Verification → Interests)
   const handleFaceComplete = useCallback(
-    async (images: Record<"front" | "left" | "right", string>) => {
+    async (images: Record<"front", string>) => {
       setLoading(true);
       try {
         // Upload face images (also sets front face as avatar_url)
         const faceRes = await fetch("/api/upload/faces", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(images),
+          body: JSON.stringify({ front: images.front }),
         });
         if (!faceRes.ok) {
           const fj = await faceRes.json();
@@ -233,15 +233,15 @@ export default function OnboardingPage() {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <div className="min-h-screen bg-(--neo-bg)">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="neo-flat">
+      <header className="neo-flat rounded-2xl">
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-primary" />
             <span className="font-semibold">Onboarding</span>
           </div>
-          <Badge variant="secondary">
+          <Badge variant="secondary" className="neo-flat">
             Step {step + 1} of {STEPS.length}
           </Badge>
         </div>
@@ -250,7 +250,7 @@ export default function OnboardingPage() {
       <div className="mx-auto max-w-2xl px-4 py-8">
         {/* Progress + Step Indicators */}
         <div className="mb-8">
-          <Progress value={progress} className="mb-4" />
+          <Progress value={progress} className="mb-4 neo-pressed" />
           <div className="flex justify-between">
             {STEPS.map((s, i) => (
               <div
@@ -352,7 +352,7 @@ export default function OnboardingPage() {
               </div>
 
               <div className="flex justify-end">
-                <Button onClick={handleDetailsReview} className="neo-btn">
+                <Button variant="outline" onClick={handleDetailsReview} className="neo-btn text-foreground">
                   Continue to Additional Info
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -450,10 +450,10 @@ export default function OnboardingPage() {
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(0)}>
+                <Button variant="outline" onClick={() => setStep(0)} className="neo-convex">
                   <ArrowLeft className="mr-2 h-4 w-4" /> Back
                 </Button>
-                <Button onClick={handleAdditionalInfo} className="flex-1 neo-btn">
+                <Button variant="outline" onClick={handleAdditionalInfo} className="flex-1 neo-btn text-foreground">
                   Continue to Face Verification
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -466,13 +466,13 @@ export default function OnboardingPage() {
         {step === 2 && (
           <div className="space-y-4">
             {loading && (
-              <div className="flex items-center justify-center gap-2 rounded-lg bg-primary/10 p-4 text-primary">
+              <div className="flex items-center justify-center gap-2 text-primary">
                 <Loader2 className="h-5 w-5 animate-spin" />
                 <span className="font-medium">Uploading face images...</span>
               </div>
             )}
             <FaceCapture onComplete={handleFaceComplete} />
-            <Button variant="outline" onClick={() => setStep(1)} disabled={loading}>
+            <Button variant="outline" onClick={() => setStep(1)} disabled={loading} className="neo-convex">
               <ArrowLeft className="mr-2 h-4 w-4" /> Back
             </Button>
           </div>
@@ -501,8 +501,8 @@ export default function OnboardingPage() {
                       onClick={() => toggleTag(tag)}
                       className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
                         isSelected
-                          ? "bg-primary text-primary-foreground shadow-md"
-                          : "neo-flat hover:bg-muted/80"
+                          ? "neo-pressed text-primary"
+                          : "neo-flat hover:neo-convex"
                       }`}
                     >
                       {tag}
@@ -530,13 +530,14 @@ export default function OnboardingPage() {
               )}
 
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(2)}>
+                <Button variant="outline" onClick={() => setStep(2)} className="neo-convex">
                   <ArrowLeft className="mr-2 h-4 w-4" /> Back
                 </Button>
                 <Button
+                  variant="outline"
                   onClick={handleComplete}
                   disabled={loading}
-                  className="flex-1 neo-btn"
+                  className="flex-1 neo-btn text-foreground"
                   size="lg"
                 >
                   {loading ? (

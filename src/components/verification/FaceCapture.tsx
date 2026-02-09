@@ -16,16 +16,14 @@ import {
   type FaceDetectionResult,
 } from "@/lib/faceDetection";
 
-type Pose = "front" | "left" | "right";
+type Pose = "front";
 
 interface FaceCaptureProps {
   onComplete: (images: Record<Pose, string>) => void;
 }
 
 const POSES: { key: Pose; label: string; instruction: string }[] = [
-  { key: "front", label: "Front", instruction: "Look straight at the camera" },
-  { key: "left", label: "Left", instruction: "Turn your head slightly to the left" },
-  { key: "right", label: "Right", instruction: "Turn your head slightly to the right" },
+  { key: "front", label: "Face Verification", instruction: "Look at camera, then slowly turn left and right" },
 ];
 
 const videoConstraints = {
@@ -46,9 +44,18 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
   const [cameraReady, setCameraReady] = useState(false);
   const [modelsLoading, setModelsLoading] = useState(true);
   const [detectionResult, setDetectionResult] = useState<FaceDetectionResult | null>(null);
+  const [validFramesCount, setValidFramesCount] = useState(0);
+  const [hasMovedLeft, setHasMovedLeft] = useState(false);
+  const [hasMovedRight, setHasMovedRight] = useState(false);
+
+  const hasMovedLeftRef = useRef(false);
+  const hasMovedRightRef = useRef(false);
 
   const currentPose = POSES[currentPoseIdx];
   const progress = (Object.keys(capturedImages).length / POSES.length) * 100;
+
+  const REQUIRED_VALID_FRAMES = 2; // Require 2 consecutive valid frames to prevent flickering
+  const isLivenessComplete = hasMovedLeft && hasMovedRight;
 
   // Load face detection models on mount
   useEffect(() => {
@@ -75,26 +82,54 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
       setDetectionResult(result);
       
       if (result.detected && result.orientation) {
-        const requiredPose = POSES[currentPoseIdx].key;
-        const isValidPose = validatePose(result.orientation, requiredPose);
+        const { yaw } = result.orientation;
+        
+        // Track left and right head movements using both state and ref
+        if (yaw < -0.3) {
+          setHasMovedLeft(true);
+          hasMovedLeftRef.current = true;
+        }
+        if (yaw > 0.3) {
+          setHasMovedRight(true);
+          hasMovedRightRef.current = true;
+        }
         
         setFaceDetected(true);
-        setPoseValid(isValidPose);
+        
+        // Check if looking at front and liveness check is complete
+        const isValidFrontPose = Math.abs(yaw) < 0.35;
+        const livenessComplete = hasMovedLeftRef.current && hasMovedRightRef.current;
+        
+        // Require multiple consecutive valid frames to prevent flickering
+        if (isValidFrontPose && livenessComplete) {
+          setValidFramesCount((count) => {
+            const newCount = count + 1;
+            if (newCount >= REQUIRED_VALID_FRAMES && !poseValid) {
+              setPoseValid(true);
+            }
+            return newCount;
+          });
+        } else {
+          setValidFramesCount(0);
+          setPoseValid(false);
+        }
       } else {
         setFaceDetected(false);
         setPoseValid(false);
+        setValidFramesCount(0);
       }
 
       // Continue detection loop
       if (Object.keys(capturedImages).length < POSES.length) {
-        setTimeout(() => detectFace(), 100); // Check every 100ms
+        setTimeout(() => detectFace(), 150); // Check every 150ms for better performance
       }
     } catch (error) {
       console.error("Face detection error:", error);
       setFaceDetected(false);
       setPoseValid(false);
+      setValidFramesCount(0);
     }
-  }, [cameraReady, modelsLoading, currentPoseIdx, capturedImages]);
+  }, [cameraReady, modelsLoading, currentPoseIdx, capturedImages, poseValid]);
 
   // Start detection loop when camera is ready
   useEffect(() => {
@@ -114,7 +149,7 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
       return;
     }
 
-    let currentCount = 3;
+    let currentCount = 1;
     setCountdown(currentCount);
 
     const interval = setInterval(() => {
@@ -147,6 +182,7 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
       setPoseValid(false);
       setCountdown(0);
       setDetectionResult(null);
+      setValidFramesCount(0);
 
       if (currentPoseIdx < POSES.length - 1) {
         setCurrentPoseIdx((i) => i + 1);
@@ -175,6 +211,11 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
     setPoseValid(false);
     setCountdown(0);
     setDetectionResult(null);
+    setValidFramesCount(0);
+    setHasMovedLeft(false);
+    setHasMovedRight(false);
+    hasMovedLeftRef.current = false;
+    hasMovedRightRef.current = false;
   };
 
   const handleUserMedia = () => {
@@ -200,8 +241,8 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
   const allCaptured = Object.keys(capturedImages).length === POSES.length;
 
   return (
-    <Card className="border-2 border-primary/20">
-      <CardHeader className="bg-linear-to-r from-primary/5 to-accent/5">
+    <Card className="neo-card">
+      <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Camera className="h-5 w-5 text-primary" />
           Face Verification - Auto Capture
@@ -211,40 +252,53 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
       <CardContent className="space-y-4 pt-6">
         {/* Pose indicators */}
         <div className="flex justify-center gap-4">
-          {POSES.map((p, i) => (
-            <motion.div
-              key={p.key}
-              initial={{ scale: 0.8 }}
-              animate={{ 
-                scale: i === currentPoseIdx && !allCaptured ? 1.1 : 1,
-                y: i === currentPoseIdx && !allCaptured ? -4 : 0
-              }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className={`flex items-center gap-1.5 text-sm transition-colors ${
-                capturedImages[p.key]
-                  ? "text-green-600"
-                  : i === currentPoseIdx
-                    ? "font-semibold text-primary"
-                    : "text-muted-foreground"
-              }`}
-            >
-              {capturedImages[p.key] ? (
-                <CheckCircle2 className="h-4 w-4" />
-              ) : (
-                <motion.span 
-                  animate={{
-                    scale: i === currentPoseIdx && !allCaptured ? [1, 1.2, 1] : 1
-                  }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                  className="flex h-4 w-4 items-center justify-center rounded-full border-2 text-xs font-bold border-current"
-                >
-                  {i + 1}
-                </motion.span>
-              )}
-              {p.label}
-            </motion.div>
-          ))}
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{ 
+              scale: !allCaptured ? 1.1 : 1,
+              y: !allCaptured ? -4 : 0
+            }}
+            transition={{ type: "spring", stiffness: 300 }}
+            className={`flex items-center gap-1.5 text-sm transition-colors ${
+              capturedImages["front"]
+                ? "text-green-600"
+                : "font-semibold text-primary"
+            }`}
+          >
+            {capturedImages["front"] ? (
+              <CheckCircle2 className="h-4 w-4" />
+            ) : (
+              <motion.span 
+                animate={{
+                  scale: !allCaptured ? [1, 1.2, 1] : 1
+                }}
+                transition={{ duration: 1, repeat: Infinity }}
+                className="flex h-4 w-4 items-center justify-center rounded-full border-2 text-xs font-bold border-current"
+              >
+                1
+              </motion.span>
+            )}
+            Face Verification
+          </motion.div>
         </div>
+
+        {/* Liveness Check Indicators */}
+        {!allCaptured && (
+          <div className="flex justify-center gap-6 text-sm">
+            <div className={`flex items-center gap-2 transition-colors ${
+              hasMovedLeft ? "text-green-600 font-semibold" : "text-muted-foreground"
+            }`}>
+              {hasMovedLeft ? <CheckCircle2 className="h-4 w-4" /> : <span className="h-4 w-4 rounded-full border-2 border-current" />}
+              Turn Left
+            </div>
+            <div className={`flex items-center gap-2 transition-colors ${
+              hasMovedRight ? "text-green-600 font-semibold" : "text-muted-foreground"
+            }`}>
+              {hasMovedRight ? <CheckCircle2 className="h-4 w-4" /> : <span className="h-4 w-4 rounded-full border-2 border-current" />}
+              Turn Right
+            </div>
+          </div>
+        )}
 
         {/* Camera / Preview */}
         <div className="relative mx-auto w-fit overflow-hidden rounded-2xl bg-linear-to-br from-gray-900 to-gray-800 shadow-2xl">
@@ -325,10 +379,15 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
                       <CheckCircle2 className="w-4 h-4" />
                       Perfect! Hold still...
                     </>
+                  ) : faceDetected && !isLivenessComplete ? (
+                    <>
+                      <AlertCircle className="w-4 h-4" />
+                      {!hasMovedLeft && !hasMovedRight ? "Slowly turn left" : !hasMovedLeft ? "Now turn left" : "Now look straight"}
+                    </>
                   ) : faceDetected ? (
                     <>
                       <AlertCircle className="w-4 h-4" />
-                      Adjust head position
+                      Look straight at camera
                     </>
                   ) : (
                     <>
@@ -343,34 +402,30 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-3 gap-3 p-4"
+              className="flex justify-center p-4"
             >
-              {POSES.map((p, idx) => (
-                <motion.div
-                  key={p.key}
-                  initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="text-center"
-                >
-                  <div className="relative">
-                    <Image
-                      src={capturedImages[p.key] || ""}
-                      alt={p.label}
-                      width={180}
-                      height={180}
-                      className="rounded-xl border-4 border-green-500 shadow-lg"
-                      unoptimized
-                    />
-                    <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg">
-                      <CheckCircle2 className="w-5 h-5" />
-                    </div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center"
+              >
+                <div className="relative">
+                  <Image
+                    src={capturedImages["front"] || ""}
+                    alt="Face Verification"
+                    width={280}
+                    height={280}
+                    className="rounded-xl border-4 border-green-500 shadow-lg"
+                    unoptimized
+                  />
+                  <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg">
+                    <CheckCircle2 className="w-5 h-5" />
                   </div>
-                  <span className="mt-2 block text-sm font-medium text-foreground">
-                    {p.label}
-                  </span>
-                </motion.div>
-              ))}
+                </div>
+                <span className="mt-2 block text-sm font-medium text-foreground">
+                  Verified
+                </span>
+              </motion.div>
             </motion.div>
           )}
         </div>
@@ -380,12 +435,14 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center space-y-3 bg-orange-50/50 rounded-lg p-4 border border-primary/10"
+            className="text-center space-y-3"
           >
             <p className="font-semibold text-lg text-primary">{currentPose.instruction}</p>
             <p className="text-sm text-muted-foreground">
-              Position your face within the circle and turn your head as instructed. 
-              Auto-capture activates when correct orientation is detected for 3 seconds.
+              1. Look straight at the camera<br />
+              2. Slowly turn your head left<br />
+              3. Slowly turn your head right<br />
+              4. Look back at the camera - photo will be captured automatically
             </p>
             {modelsLoading && (
               <motion.p 
@@ -417,7 +474,7 @@ export default function FaceCapture({ onComplete }: FaceCaptureProps) {
               onClick={retake}
               className="gap-2"
             >
-              <RotateCcw className="h-4 w-4" /> Retake All
+              <RotateCcw className="h-4 w-4" /> Retake Photo
             </Button>
           </motion.div>
         )}

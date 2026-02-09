@@ -137,23 +137,23 @@ export function validatePose(
 ): boolean {
   const { yaw, pitch, roll } = orientation;
   
-  // Ensure face is relatively level (not tilted too much)
-  if (Math.abs(pitch) > 0.3 || Math.abs(roll) > 0.3) {
+  // More forgiving tilt tolerance
+  if (Math.abs(pitch) > 0.5 || Math.abs(roll) > 0.5) {
     return false;
   }
 
   switch (requiredPose) {
     case 'front':
-      // Face should be centered (yaw near 0)
-      return Math.abs(yaw) < 0.25;
+      // Face should be roughly centered (more forgiving)
+      return Math.abs(yaw) < 0.35;
     
     case 'left':
-      // Face should be turned left (negative yaw)
-      return yaw < -0.2 && yaw > -0.7;
+      // Face should be turned left (more forgiving range)
+      return yaw < -0.15 && yaw > -0.8;
     
     case 'right':
-      // Face should be turned right (positive yaw)
-      return yaw > 0.2 && yaw < 0.7;
+      // Face should be turned right (more forgiving range)
+      return yaw > 0.15 && yaw < 0.8;
     
     default:
       return false;
@@ -183,9 +183,19 @@ export async function cropToSquare(
         return;
       }
 
+      if (img.width === 0 || img.height === 0) {
+        resolve(imageDataUrl);
+        return;
+      }
+
       // Calculate square size with padding
       const faceSize = Math.max(boundingBox.width, boundingBox.height);
       const squareSize = Math.round(faceSize * (1 + padding));
+
+      if (squareSize <= 0) {
+        resolve(imageDataUrl);
+        return;
+      }
       
       // Calculate center of face
       const faceCenterX = boundingBox.x + boundingBox.width / 2;
@@ -194,6 +204,11 @@ export async function cropToSquare(
       // Calculate crop position (ensure within image bounds)
       const cropX = Math.max(0, Math.min(faceCenterX - squareSize / 2, img.width - squareSize));
       const cropY = Math.max(0, Math.min(faceCenterY - squareSize / 2, img.height - squareSize));
+
+      if (cropX < 0 || cropY < 0) {
+        resolve(imageDataUrl);
+        return;
+      }
       
       // Set canvas to square size
       canvas.width = squareSize;

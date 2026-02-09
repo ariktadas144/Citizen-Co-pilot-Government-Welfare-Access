@@ -4,9 +4,28 @@ import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="relative neo-flat hover:neo-pressed rounded-xl w-10 h-10"
+        aria-label="Toggle theme"
+      >
+        <Sun className="h-5 w-5 text-orange-500" />
+      </Button>
+    );
+  }
 
   return (
     <Button

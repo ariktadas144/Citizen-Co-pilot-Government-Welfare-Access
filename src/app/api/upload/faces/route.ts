@@ -15,25 +15,21 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { front, left, right } = body;
+    const { front } = body;
 
-    if (!front || !left || !right) {
+    if (!front) {
       return NextResponse.json(
-        { error: "All three face images (front, left, right) are required" },
+        { error: "Front face image is required" },
         { status: 400 }
       );
     }
 
     const uploads: Record<string, string | null> = {
       face_front_url: null,
-      face_left_url: null,
-      face_right_url: null,
     };
 
     const images = [
       { key: "face_front_url", data: front, name: "front" },
-      { key: "face_left_url", data: left, name: "left" },
-      { key: "face_right_url", data: right, name: "right" },
     ];
 
     for (const img of images) {
@@ -63,8 +59,6 @@ export async function POST(request: NextRequest) {
       .from("user_profiles")
       .update({
         face_front_url: uploads.face_front_url,
-        face_left_url: uploads.face_left_url,
-        face_right_url: uploads.face_right_url,
         avatar_url: uploads.face_front_url, // Use front face as profile avatar
         face_verified: true,
         updated_at: new Date().toISOString(),

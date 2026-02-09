@@ -308,8 +308,7 @@ export default function LandingPage() {
 
       {/* Features - 3D Neomorphic Cards */}
       <section className="py-32 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-50/30 to-transparent" />
-        <div className="mx-auto max-w-7xl px-6 relative z-10">
+        <div className="mx-auto max-w-7xl px-6">
           <div className="mb-16 text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -363,7 +362,7 @@ export default function LandingPage() {
       </section>
 
       {/* Benefits - Alternating Neomorphic Layout */}
-      <section className="py-32 bg-gradient-to-br from-orange-50/50 to-blue-50/30">
+      <section className="py-32">
         <div className="mx-auto max-w-7xl px-6">
           <motion.div
             className="text-center mb-20"
@@ -414,8 +413,7 @@ export default function LandingPage() {
 
       {/* How it works - Interactive Timeline */}
       <section id="how-it-works" className="py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-50/20 to-transparent" />
-        <div className="mx-auto max-w-7xl px-6 relative z-10">
+        <div className="mx-auto max-w-7xl px-6">
           <motion.div
             className="mb-20 text-center"
             initial={{ opacity: 0, y: 20 }}
@@ -475,7 +473,7 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials - Neomorphic Cards */}
-      <section className="py-32 bg-gradient-to-br from-blue-50/30 to-purple-50/30">
+      <section className="py-32">
         <div className="mx-auto max-w-7xl px-6">
           <motion.div
             className="mb-20 text-center"
@@ -615,7 +613,7 @@ export default function LandingPage() {
       </section>
 
       {/* Trust Indicators - Neomorphic Badges */}
-      <section className="py-32 bg-gradient-to-br from-orange-50/40 to-blue-50/40">
+      <section className="py-32">
         <div className="mx-auto max-w-7xl px-6">
           <motion.div
             className="neo-card p-16 text-center"
@@ -731,8 +729,7 @@ export default function LandingPage() {
 
       {/* CTA - Premium Neomorphic Design */}
       <section className="py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-100/50 via-purple-100/30 to-blue-100/40" />
-        <div className="mx-auto max-w-5xl px-6 relative z-10">
+        <div className="mx-auto max-w-5xl px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -808,8 +805,7 @@ export default function LandingPage() {
 
       {/* Footer - Neomorphic */}
       <footer className="py-16 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-orange-50/30 to-transparent" />
-        <div className="mx-auto max-w-7xl px-6 relative z-10">
+        <div className="mx-auto max-w-7xl px-6">
           <div className="neo-card p-12 rounded-3xl">
             <div className="grid md:grid-cols-4 gap-12 mb-12">
               {/* Brand */}
