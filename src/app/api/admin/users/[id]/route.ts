@@ -48,9 +48,10 @@ const ALLOWED_FIELDS = new Set([
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabase = await createClient();
     const {
       data: { user },
@@ -78,7 +79,7 @@ export async function PATCH(
     const { data, error } = await supabase
       .from("user_profiles")
       .update(updateData)
-      .eq("id", params.id)
+      .eq("id", id)
       .select("*")
       .single();
 

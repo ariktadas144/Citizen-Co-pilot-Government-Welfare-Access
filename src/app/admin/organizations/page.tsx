@@ -113,7 +113,6 @@ export default function AdminOrganizationsPage() {
             size="sm"
             onClick={() => setTab("orgs")}
             className="rounded-xl"
-            className="rounded-xl"
           >
             <Building2 className="mr-1 h-4 w-4" />
             Orgs ({orgs.length})
@@ -122,7 +121,6 @@ export default function AdminOrganizationsPage() {
             variant={tab === "requests" ? "default" : "outline"}
             size="sm"
             onClick={() => setTab("requests")}
-            className="rounded-xl"
             className="rounded-xl"
           >
             <Clock className="mr-1 h-4 w-4" />
