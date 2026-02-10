@@ -96,8 +96,8 @@ const steps = [
   },
   {
     step: "02",
-    title: "Upload Your ID",
-    description: "Aadhaar, Voter ID, or other government IDs.",
+    title: "Complete your profile",
+    description: "Enter your profile information.",
     icon: FileSearch,
   },
   {
@@ -247,7 +247,7 @@ export default function LandingPage() {
 
             {/* Subheading */}
             <p className="mx-auto mt-8 max-w-3xl text-xl text-muted-foreground leading-relaxed">
-              Upload your ID, verify your identity with cutting-edge AI, and discover 
+             Fill your profile information, verify your identity with cutting-edge AI, and discover 
               <span className="font-bold text-emerald-600"> every government welfare scheme </span>
               you&apos;re eligible for — all in just 
               <span className="font-bold text-emerald-600"> 2 minutes</span>.
@@ -630,7 +630,7 @@ export default function LandingPage() {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {[
-                { icon: Shield, label: "256-bit Encryption", sublabel: "Bank-grade Security" },
+                { icon: Shield, label: "Secure information", sublabel: "Protected by RLS" },
                 { icon: CheckCheck, label: "99% Accuracy", sublabel: "AI-Powered Matching" },
                 { icon: Clock, label: "2 Min Setup", sublabel: "Lightning Fast" },
                 { icon: Users, label: "100% Free", sublabel: "Always Free to Use" },
