@@ -26,6 +26,13 @@ export interface UserProfile {
   // Verification
   id_verified: boolean;
   face_verified: boolean;
+  uploaded_documents?: {
+    name: string;
+    url?: string;
+    path?: string;
+    type?: string;
+    uploaded_at: string;
+  }[];
   onboarding_completed: boolean;
 
   // Additional profile

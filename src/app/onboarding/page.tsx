@@ -234,7 +234,7 @@ export default function OnboardingPage() {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+    <div className="min-h-screen neo-surface-gradient">
       {/* Header */}
       <header className="neo-elevated rounded-2xl">
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-4">
@@ -260,7 +260,7 @@ export default function OnboardingPage() {
                 className={`flex items-center gap-1.5 text-xs ${
                   i <= step
                     ? "font-medium text-emerald-600"
-                    : "text-slate-500"
+                    : "text-muted-foreground"
                 }`}
               >
                 {i < step ? (
@@ -327,10 +327,10 @@ export default function OnboardingPage() {
                     <SelectTrigger className="neo-inset border-0">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Male">Male</SelectItem>
-                      <SelectItem value="Female">Female</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
+                    <SelectContent className="neo-elevated-lg border border-border/60 bg-card text-foreground">
+                      <SelectItem value="Male" className="text-foreground focus:bg-muted/60">Male</SelectItem>
+                      <SelectItem value="Female" className="text-foreground focus:bg-muted/60">Female</SelectItem>
+                      <SelectItem value="Other" className="text-foreground focus:bg-muted/60">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -345,9 +345,9 @@ export default function OnboardingPage() {
                   <SelectTrigger className="neo-inset border-0">
                     <SelectValue placeholder="Select state" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="neo-elevated-lg border border-border/60 bg-card text-foreground">
                     {INDIAN_STATES.map((s) => (
-                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                      <SelectItem key={s} value={s} className="text-foreground focus:bg-muted/60">{s}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -404,9 +404,9 @@ export default function OnboardingPage() {
                     <SelectTrigger className="neo-inset border-0">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="neo-elevated-lg border border-border/60 bg-card text-foreground">
                       {CASTE_CATEGORIES.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                        <SelectItem key={c} value={c} className="text-foreground focus:bg-muted/60">{c}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -423,9 +423,9 @@ export default function OnboardingPage() {
                     <SelectTrigger className="neo-inset border-0">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="neo-elevated-lg border border-border/60 bg-card text-foreground">
                       {OCCUPATIONS.map((o) => (
-                        <SelectItem key={o} value={o}>{o}</SelectItem>
+                        <SelectItem key={o} value={o} className="text-foreground focus:bg-muted/60">{o}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -439,13 +439,13 @@ export default function OnboardingPage() {
                     <SelectTrigger className="neo-inset border-0">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">No Disability</SelectItem>
-                      <SelectItem value="physical">Physical</SelectItem>
-                      <SelectItem value="visual">Visual</SelectItem>
-                      <SelectItem value="hearing">Hearing</SelectItem>
-                      <SelectItem value="intellectual">Intellectual</SelectItem>
-                      <SelectItem value="multiple">Multiple</SelectItem>
+                    <SelectContent className="neo-elevated-lg border border-border/60 bg-card text-foreground">
+                      <SelectItem value="none" className="text-foreground focus:bg-muted/60">No Disability</SelectItem>
+                      <SelectItem value="physical" className="text-foreground focus:bg-muted/60">Physical</SelectItem>
+                      <SelectItem value="visual" className="text-foreground focus:bg-muted/60">Visual</SelectItem>
+                      <SelectItem value="hearing" className="text-foreground focus:bg-muted/60">Hearing</SelectItem>
+                      <SelectItem value="intellectual" className="text-foreground focus:bg-muted/60">Intellectual</SelectItem>
+                      <SelectItem value="multiple" className="text-foreground focus:bg-muted/60">Multiple</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -557,3 +557,4 @@ export default function OnboardingPage() {
     </div>
   );
 }
+

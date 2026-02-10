@@ -120,7 +120,7 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+      <div className="min-h-screen flex items-center justify-center neo-surface-gradient">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -131,7 +131,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+    <div className="min-h-screen neo-surface-gradient">
       {/* Header Component */}
       <Header />
 
@@ -147,11 +147,11 @@ export default function HomePage() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-1 h-8 bg-gradient-to-b from-emerald-500 to-emerald-600 rounded-full" />
-                <h2 className="text-3xl font-bold text-slate-700">
+                <h2 className="text-3xl font-bold text-foreground">
                   {t("featured.title")}
                 </h2>
               </div>
-              <p className="text-slate-600 ml-7">
+              <p className="text-muted-foreground ml-7">
                 {t("featured.subtitle")}
               </p>
             </div>
@@ -163,7 +163,7 @@ export default function HomePage() {
                 onClick={() => scrollFeatured("left")}
                 className="neo-elevated rounded-full border-0 hover:neo-elevated-sm"
               >
-                <ChevronLeft className="w-5 h-5 text-slate-700" />
+                <ChevronLeft className="w-5 h-5 text-foreground" />
               </Button>
               <Button
                 variant="outline"
@@ -171,7 +171,7 @@ export default function HomePage() {
                 onClick={() => scrollFeatured("right")}
                 className="neo-elevated rounded-full border-0 hover:neo-elevated-sm"
               >
-                <ChevronRight className="w-5 h-5 text-slate-700" />
+                <ChevronRight className="w-5 h-5 text-foreground" />
               </Button>
             </div>
           </motion.div>
@@ -193,7 +193,7 @@ export default function HomePage() {
       </section>
 
       {/* Eligible Schemes */}
-      <section className="py-16 bg-gradient-to-br from-[#f0f0f3] to-[#e8e8eb]">
+      <section className="py-16 neo-surface-alt">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -203,11 +203,11 @@ export default function HomePage() {
           >
             <div className="flex items-center gap-3 mb-2">
               <div className="w-1 h-8 bg-gradient-to-b from-emerald-500 to-emerald-600 rounded-full" />
-              <h2 className="text-3xl font-bold text-slate-700">
+              <h2 className="text-3xl font-bold text-foreground">
                 {t("eligible.title")}
               </h2>
             </div>
-            <p className="text-slate-600 ml-7">
+            <p className="text-muted-foreground ml-7">
               {t("eligible.subtitle")}
             </p>
           </motion.div>
@@ -235,11 +235,11 @@ export default function HomePage() {
           >
             <div className="flex items-center gap-3 mb-2">
               <div className="w-1 h-8 bg-gradient-to-b from-emerald-500 to-emerald-600 rounded-full" />
-              <h2 className="text-3xl font-bold text-slate-700">
+              <h2 className="text-3xl font-bold text-foreground">
                 {t("all.title")}
               </h2>
             </div>
-            <p className="text-slate-600 ml-7">
+            <p className="text-muted-foreground ml-7">
               {t("all.subtitle")}
             </p>
           </motion.div>
@@ -266,3 +266,4 @@ export default function HomePage() {
     </div>
   );
 }
+

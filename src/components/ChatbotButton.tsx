@@ -227,7 +227,7 @@ export function ChatbotButton() {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="fixed bottom-24 right-4 z-40 w-[min(420px,calc(100vw-2rem))]"
           >
-            <div className="neo-elevated rounded-3xl overflow-hidden shadow-2xl border-2 border-white/50 dark:border-white/10">
+            <div className="neo-elevated rounded-3xl overflow-hidden shadow-2xl border-2 border-border/60 bg-card">
               {/* Header */}
               <div className="bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-700 p-4 text-white">
                 <div className="flex items-center gap-3">
@@ -253,7 +253,7 @@ export function ChatbotButton() {
               <div
                 ref={scrollContainerRef}
                 onScroll={handleScroll}
-                className="max-h-[calc(100vh-20rem)] overflow-y-auto p-4 bg-gradient-to-b from-emerald-50/40 dark:from-emerald-900/10 to-background space-y-4 neo-scrollbar"
+                className="max-h-[calc(100vh-20rem)] overflow-y-auto p-4 bg-card space-y-4 neo-scrollbar"
               >
                 {loading && (
                   <div className="text-center text-sm text-muted-foreground">
@@ -326,7 +326,7 @@ export function ChatbotButton() {
               </div>
 
               {/* Quick Actions */}
-              <div className="p-3 bg-emerald-50/40 dark:bg-emerald-900/10 border-t border-white/40 dark:border-white/10 flex gap-2 overflow-x-auto">
+              <div className="p-3 bg-card border-t border-border/60 flex gap-2 overflow-x-auto">
                 {quickActions.map((action) => (
                   <motion.button
                     key={action.label}
@@ -344,7 +344,7 @@ export function ChatbotButton() {
               </div>
 
               {/* Input */}
-              <div className="p-4 bg-[#f0f0f3] dark:bg-[hsl(240,10%,12%)] border-t border-white/40 dark:border-white/10">
+              <div className="p-4 bg-card border-t border-border/60">
                 <div className="flex gap-2">
                   <Textarea
                     value={input}

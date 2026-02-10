@@ -135,7 +135,7 @@ export default function OrgDashboardPage() {
         {statCards.map((c) => (
           <div key={c.title} className="neo-elevated-lg rounded-2xl">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-500">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
                 {c.title}
               </CardTitle>
               <div className={`rounded-lg p-2 ${c.bg}`}>
@@ -265,11 +265,11 @@ export default function OrgDashboardPage() {
               </div>
               <div className="text-center p-4 rounded-lg neo-inset">
                 <p className="text-3xl font-bold text-blue-700 dark:text-blue-400">{analytics.activeSchemes}</p>
-                <p className="text-sm text-slate-500 mt-1">Active Schemes</p>
+                <p className="text-sm text-muted-foreground mt-1">Active Schemes</p>
               </div>
               <div className="text-center p-4 rounded-lg neo-inset">
                 <p className="text-3xl font-bold text-yellow-700 dark:text-yellow-400">{analytics.pendingApplications}</p>
-                <p className="text-sm text-slate-500 mt-1">Awaiting Review</p>
+                <p className="text-sm text-muted-foreground mt-1">Awaiting Review</p>
               </div>
             </div>
           </CardContent>
@@ -278,3 +278,4 @@ export default function OrgDashboardPage() {
     </div>
   );
 }
+

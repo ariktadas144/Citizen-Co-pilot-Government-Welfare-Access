@@ -72,7 +72,7 @@ export default function AdminSchemesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
       </div>
     );
   }
@@ -80,9 +80,9 @@ export default function AdminSchemesPage() {
   return (
     <div className="p-6">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Schemes ({schemes.length})</h1>
+        <h1 className="text-2xl font-bold text-foreground">Schemes ({schemes.length})</h1>
         <Link href="/admin/schemes/new">
-          <Button>
+          <Button className="rounded-xl">
             <Plus className="mr-2 h-4 w-4" /> Add Scheme
           </Button>
         </Link>
@@ -92,7 +92,7 @@ export default function AdminSchemesPage() {
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search by name, category, or department..."
-          className="pl-9"
+          className="pl-9 neo-inset rounded-xl border-0"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -100,18 +100,18 @@ export default function AdminSchemesPage() {
 
       <div className="grid gap-3">
         {filtered.length === 0 ? (
-          <Card>
+          <Card className="neo-elevated-lg rounded-2xl border-0">
             <CardContent className="py-12 text-center text-muted-foreground">
               No schemes found.
             </CardContent>
           </Card>
         ) : (
           filtered.map((s) => (
-            <Card key={s.id}>
+            <Card key={s.id} className="neo-elevated-lg rounded-2xl border-0">
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
-                    <CardTitle className="text-base">
+                    <CardTitle className="text-base text-foreground">
                       {s.scheme_name}
                     </CardTitle>
                     <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
@@ -120,17 +120,17 @@ export default function AdminSchemesPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     <Link href={`/admin/schemes/new?edit=${s.id}`}>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" className="rounded-xl">
                         <Pencil className="h-4 w-4" />
                       </Button>
                     </Link>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" className="rounded-xl">
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent className="neo-elevated-lg rounded-2xl border border-border/60">
                         <AlertDialogHeader>
                           <AlertDialogTitle>Deactivate Scheme?</AlertDialogTitle>
                           <AlertDialogDescription>
@@ -139,8 +139,8 @@ export default function AdminSchemesPage() {
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(s.id)}>
+                          <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(s.id)} className="rounded-xl">
                             Deactivate
                           </AlertDialogAction>
                         </AlertDialogFooter>
@@ -174,3 +174,4 @@ export default function AdminSchemesPage() {
     </div>
   );
 }
+

@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import "@/lib/i18n";
 import { tDb } from "@/lib/dbI18n";
+import { resolvePosterUrl } from "@/lib/utils";
 
 interface EligibleSchemeCardProps {
   scheme: {
@@ -19,6 +20,7 @@ interface EligibleSchemeCardProps {
     benefits: string;
     eligibility_score?: number;
     scheme_type?: "government" | "private";
+    poster_url?: string | null;
   };
   index: number;
 }
@@ -38,6 +40,7 @@ export function EligibleSchemeCard({
   const score = scheme.eligibility_score || 85;
   const isPrivate = scheme.scheme_type === "private";
   const scoreGradient = isPrivate ? "from-emerald-500 to-emerald-600" : "from-orange-500 to-orange-600";
+  const posterUrl = resolvePosterUrl(scheme.poster_url);
 
   return (
     <motion.div
@@ -52,6 +55,19 @@ export function EligibleSchemeCard({
           transition={{ duration: 0.3 }}
           className="group relative h-full p-6 neo-elevated-lg hover:neo-elevated-xl rounded-2xl transition-all duration-300 overflow-hidden"
         >
+          {/* Poster Image */}
+          {posterUrl && (
+            <div className="relative h-36 -mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl">
+              <img
+                src={posterUrl}
+                alt={name}
+                className="w-full h-full object-cover"
+                onError={(e) => { e.currentTarget.parentElement!.style.display = 'none'; }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+            </div>
+          )}
+
           {/* Match Score Indicator */}
           <div className="absolute top-4 right-4 flex flex-col items-end gap-1">
             <motion.div
@@ -83,7 +99,7 @@ export function EligibleSchemeCard({
                 <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
               </motion.div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-slate-700 group-hover:text-emerald-600 transition-colors line-clamp-2 mb-1">
+                <h3 className="text-lg font-bold text-foreground group-hover:text-emerald-600 transition-colors line-clamp-2 mb-1">
                   {name}
                 </h3>
                 <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200">
@@ -93,14 +109,14 @@ export function EligibleSchemeCard({
             </div>
 
             {/* Description */}
-            <p className="text-sm text-slate-600 line-clamp-3">
+            <p className="text-sm text-muted-foreground line-clamp-3">
               {description}
             </p>
 
             {/* Benefits */}
             {benefits && (
-              <div className="pt-3 border-t border-slate-200">
-                <p className="text-xs text-slate-600 line-clamp-2">
+              <div className="pt-3 border-t border-border">
+                <p className="text-xs text-muted-foreground line-clamp-2">
                   <span className="font-semibold text-emerald-600">{t("common.keyBenefit")}:</span>{" "}
                   {benefits.split(".")[0]}
                 </p>

@@ -12,8 +12,8 @@ if (process.env.NEXT_PUBLIC_CONVEX_URL) {
 }
 
 async function isAdmin(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
-  const { data } = await supabase.from("admin_users").select("id").eq("id", userId).single();
-  return !!data;
+  const { data } = await supabase.from("admin_users").select("id, enabled").eq("id", userId).single();
+  return !!data && data.enabled !== false;
 }
 
 // POST — send targeted notifications

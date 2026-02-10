@@ -61,7 +61,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="relative bg-gradient-to-br from-[#e8e8eb]/60 via-[#f0f0f3]/40 to-[#e8e8eb]/60 dark:from-[hsl(240,10%,10%)]/60 dark:via-[hsl(240,10%,12%)]/40 dark:to-[hsl(240,10%,10%)]/60 border-t border-white/40 dark:border-white/10 mt-20">
+    <footer className="relative neo-surface-alt border-t border-border/60 mt-12">
       {/* Wave Divider */}
       <div className="absolute top-0 left-0 right-0 -translate-y-full">
         <svg
@@ -71,7 +71,7 @@ export function Footer() {
         >
           <path
             d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,0L0,0Z"
-            className="fill-[#f0f0f3] dark:fill-[hsl(240,10%,10%)]"
+            className="fill-card"
           />
         </svg>
       </div>
@@ -113,7 +113,7 @@ export function Footer() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                 <Mail className="h-4 w-4" />
-                <a href="mailto:support@citizenschemes.gov.in">support@citizenschemes.gov.in</a>
+                <a href="mailto:holamigo@gmail.com">holamigo@gmail.com</a>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                 <Phone className="h-4 w-4" />
@@ -230,7 +230,7 @@ export function Footer() {
           >
             <div className="flex items-center gap-1">
               <div className="h-4 w-4 rounded-full bg-emerald-500" />
-              <div className="h-4 w-4 rounded-full bg-white border border-border" />
+              <div className="h-4 w-4 rounded-full bg-card border border-border/60" />
               <div className="h-4 w-4 rounded-full bg-green-600" />
             </div>
             <span className="text-xs font-medium text-muted-foreground">

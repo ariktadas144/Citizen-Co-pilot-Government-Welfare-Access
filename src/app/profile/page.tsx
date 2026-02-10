@@ -22,6 +22,9 @@ import {
   Edit2,
   Save,
   X as XIcon,
+  Upload,
+  FileText,
+  Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,11 +37,21 @@ import type { UserProfile } from "../../../types/user";
 
 export default function ProfilePage() {
   const { t } = useTranslation();
+  type ProfileDocument = {
+    name: string;
+    url?: string;
+    path?: string;
+    type?: string;
+    uploaded_at: string;
+  };
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editedProfile, setEditedProfile] = useState<Partial<UserProfile>>({});
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [documents, setDocuments] = useState<ProfileDocument[]>([]);
+  const [openingDoc, setOpeningDoc] = useState<string | null>(null);
   const router = useRouter();
 
   const fetchProfile = useCallback(async () => {
@@ -62,6 +75,7 @@ export default function ProfilePage() {
       if (data) {
         setProfile(data);
         setEditedProfile(data);
+        setDocuments(data.uploaded_documents || []);
       }
     } catch (error) {
       console.error("Failed to fetch profile:", error);
@@ -111,9 +125,45 @@ export default function ProfilePage() {
     router.push("/login");
   }
 
+  const handleViewDocument = async (doc: ProfileDocument) => {
+    const docKey = doc.path || doc.url || doc.name;
+    if (!docKey) {
+      alert("Document is missing a file reference.");
+      return;
+    }
+
+    setOpeningDoc(docKey);
+    const popup = window.open("", "_blank");
+    try {
+      const res = await fetch("/api/documents/signed-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: doc.path, url: doc.url }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.url) {
+        throw new Error(json.error || "Failed to open document");
+      }
+      if (popup) {
+        popup.opener = null;
+        popup.location.href = json.url;
+      } else {
+        window.location.href = json.url;
+      }
+    } catch (error) {
+      console.error("Failed to open document:", error);
+      if (popup) {
+        popup.close();
+      }
+      alert("Failed to open document. Please try again.");
+    } finally {
+      setOpeningDoc(null);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+      <div className="min-h-screen flex items-center justify-center neo-surface-gradient">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -152,7 +202,7 @@ export default function ProfilePage() {
 
     return (
       <div className="space-y-2">
-        <Label className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+        <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
           <Icon className="h-4 w-4 text-emerald-600" />
           {label}
         </Label>
@@ -175,7 +225,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+    <div className="min-h-screen neo-surface-gradient">
       <Header />
 
       {/* Hero Section */}
@@ -376,7 +426,7 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
               <div className="space-y-2">
-                <Label className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+                <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                   <MapPin className="h-4 w-4 text-emerald-600" />
                   Address
                 </Label>
@@ -388,7 +438,7 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+              <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                 <MapPin className="h-4 w-4 text-emerald-600" />
                 District
               </Label>
@@ -397,7 +447,7 @@ export default function ProfilePage() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+              <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                 <MapPin className="h-4 w-4 text-emerald-600" />
                 State
               </Label>
@@ -406,7 +456,7 @@ export default function ProfilePage() {
               </p>
             </div>
             <div className="space-y-2">
-              <Label className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+              <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                 <MapPin className="h-4 w-4 text-emerald-600" />
                 Pincode
               </Label>
@@ -470,7 +520,7 @@ export default function ProfilePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label className="flex items-center gap-2 text-sm font-semibold text-slate-600 mb-2">
+              <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground mb-2">
                 <Shield className="h-4 w-4 text-emerald-600" />
                 Aadhaar Number
               </Label>
@@ -481,7 +531,7 @@ export default function ProfilePage() {
               </p>
             </div>
             <div>
-              <Label className="flex items-center gap-2 text-sm font-semibold text-slate-600 mb-2">
+              <Label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground mb-2">
                 <Shield className="h-4 w-4 text-emerald-600" />
                 Voter ID
               </Label>
@@ -491,6 +541,127 @@ export default function ProfilePage() {
             </div>
           </div>
         </motion.div>
+
+        {/* Uploaded Documents */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="neo-elevated-lg rounded-2xl p-6"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <Upload className="h-5 w-5 text-emerald-600" />
+              <h3 className="text-xl font-bold text-foreground">My Documents</h3>
+            </div>
+            <label className="cursor-pointer">
+              <Button
+                variant="outline"
+                size="sm"
+                className="neo-elevated rounded-xl"
+                disabled={uploadingDoc}
+                asChild
+              >
+                <span>
+                  {uploadingDoc ? (
+                    <span className="flex items-center gap-2">Uploading...</span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Upload className="h-4 w-4" /> Upload Document
+                    </span>
+                  )}
+                </span>
+              </Button>
+              <input
+                type="file"
+                className="hidden"
+                accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setUploadingDoc(true);
+                  try {
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    formData.append("purpose", "identity");
+                    const res = await fetch("/api/upload/documents", {
+                      method: "POST",
+                      body: formData,
+                    });
+                    const json = await res.json();
+                    if (res.ok) {
+                      setDocuments((prev) => [
+                        ...prev,
+                        { name: file.name, url: json.url, path: json.path, type: file.type, uploaded_at: new Date().toISOString() },
+                      ]);
+                    } else {
+                      alert(json.error || "Upload failed");
+                    }
+                  } catch {
+                    alert("Upload failed");
+                  } finally {
+                    setUploadingDoc(false);
+                  }
+                }}
+              />
+            </label>
+          </div>
+
+          {documents.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <FileText className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
+              <p>No documents uploaded yet.</p>
+              <p className="text-sm mt-1">Upload ID proofs, certificates, etc. to use in applications.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {documents.map((doc, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-3 p-3 rounded-xl neo-elevated"
+                >
+                  <FileText className="h-5 w-5 text-emerald-600 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{doc.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(doc.uploaded_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleViewDocument(doc)}
+                      disabled={openingDoc === (doc.path || doc.url || doc.name)}
+                      className="text-xs text-emerald-600 hover:underline px-2"
+                    >
+                      {openingDoc === (doc.path || doc.url || doc.name) ? "Opening..." : "View"}
+                    </Button>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={async () => {
+                      try {
+                        await fetch("/api/upload/documents", {
+                          method: "DELETE",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ url: doc.url }),
+                        });
+                        setDocuments((prev) => prev.filter((_, i) => i !== idx));
+                      } catch {
+                        alert("Failed to delete");
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
       </div>
 
       <Footer />
@@ -498,4 +669,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

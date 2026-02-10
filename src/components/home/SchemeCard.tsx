@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import "@/lib/i18n";
 import { tDb } from "@/lib/dbI18n";
+import { resolvePosterUrl } from "@/lib/utils";
 
 interface SchemeCardProps {
   scheme: {
@@ -19,6 +20,7 @@ interface SchemeCardProps {
     state: string | null;
     department: string | null;
     official_website: string | null;
+    poster_url?: string | null;
   };
   index: number;
 }
@@ -41,6 +43,7 @@ export function SchemeCard({ scheme, index }: SchemeCardProps) {
   const department = scheme.department
     ? tDb(t, "schemes", schemeId, "department", scheme.department)
     : null;
+  const posterUrl = resolvePosterUrl(scheme.poster_url);
 
   return (
     <motion.div
@@ -57,11 +60,24 @@ export function SchemeCard({ scheme, index }: SchemeCardProps) {
         >
           {/* Animated Corner Accent - removed for clean neomorphism */}
 
+          {/* Poster Image */}
+          {posterUrl && (
+            <div className="relative h-32 -mx-6 -mt-6 mb-4 overflow-hidden rounded-t-2xl">
+              <img
+                src={posterUrl}
+                alt={name}
+                className="w-full h-full object-cover"
+                onError={(e) => { e.currentTarget.parentElement!.style.display = 'none'; }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+            </div>
+          )}
+
           <div className="space-y-4">
             {/* Header with Icon */}
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1">
-                <h3 className="text-base font-bold text-slate-700 group-hover:text-emerald-600 transition-colors line-clamp-2 mb-2">
+                <h3 className="text-base font-bold text-foreground group-hover:text-emerald-600 transition-colors line-clamp-2 mb-2">
                   {name}
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -69,7 +85,7 @@ export function SchemeCard({ scheme, index }: SchemeCardProps) {
                     {category}
                   </Badge>
                   {state && (
-                    <Badge variant="outline" className="text-xs flex items-center gap-1 border-slate-300 text-slate-600">
+                    <Badge variant="outline" className="text-xs flex items-center gap-1 border-border text-muted-foreground">
                       <MapPin className="w-3 h-3" />
                       {state}
                     </Badge>
@@ -85,14 +101,14 @@ export function SchemeCard({ scheme, index }: SchemeCardProps) {
             </div>
 
             {/* Description */}
-            <p className="text-sm text-slate-600 line-clamp-3">
+            <p className="text-sm text-muted-foreground line-clamp-3">
               {description}
             </p>
 
             {/* Footer */}
-            <div className="flex items-center justify-between pt-2 border-t border-slate-200">
+            <div className="flex items-center justify-between pt-2 border-t border-border">
               {department && (
-                <p className="text-xs text-slate-600 line-clamp-1 flex-1">
+                <p className="text-xs text-muted-foreground line-clamp-1 flex-1">
                   {department}
                 </p>
               )}

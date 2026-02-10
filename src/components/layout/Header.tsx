@@ -50,7 +50,7 @@ export function Header() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-[#f0f0f3]/80 dark:bg-[hsl(240,10%,10%)]/80 backdrop-blur-xl border-b border-white/40 dark:border-white/10 shadow-[6px_6px_12px_rgba(163,177,198,0.4),-6px_-6px_12px_rgba(255,255,255,0.8)] dark:shadow-[4px_4px_10px_hsl(240,12%,6%),-4px_-4px_10px_hsl(240,10%,18%)] transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-50 neo-surface-alt backdrop-blur-xl border-b border-border/60 transition-all duration-300"
       >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
@@ -174,7 +174,7 @@ export function Header() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden border-t border-white/40 dark:border-white/10 bg-[#f0f0f3]/90 dark:bg-[hsl(240,10%,10%)]/90 backdrop-blur-xl"
+              className="lg:hidden border-t border-border/60 neo-surface-alt backdrop-blur-xl"
             >
               <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
                 {navLinks.map((link) => {

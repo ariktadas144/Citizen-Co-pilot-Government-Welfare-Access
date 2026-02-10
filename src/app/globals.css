@@ -739,11 +739,12 @@ body {
 }
 
 .neo-message-assistant {
-  background: linear-gradient(to br, #f0f0f3, #e8e8eb);
+  background: linear-gradient(145deg, #e2e6ee, #f1f3f7);
   color: #334155;
+  border: 1px solid rgba(148, 163, 184, 0.2);
   box-shadow: 
-    8px 8px 18px rgba(163, 177, 198, 0.5),
-    -6px -6px 14px rgba(255, 255, 255, 0.9);
+    8px 8px 18px rgba(163, 177, 198, 0.45),
+    -6px -6px 14px rgba(255, 255, 255, 0.85);
 }
 
 /* Utility for text colors */

@@ -85,20 +85,20 @@ export default function MyApplicationsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+      <div className="flex min-h-screen items-center justify-center neo-surface-gradient">
         <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+    <div className="min-h-screen neo-surface-gradient">
       <Header />
 
       <div className="mx-auto max-w-4xl px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">My Applications</h1>
-          <p className="mt-1 text-slate-500">
+          <p className="mt-1 text-muted-foreground">
             Track the status of your scheme applications
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function MyApplicationsPage() {
                 <s.icon className={`h-5 w-5 ${s.color}`} />
                 <div>
                   <p className="text-2xl font-bold text-foreground">{s.value}</p>
-                  <p className="text-xs text-slate-500">{s.label}</p>
+                  <p className="text-xs text-muted-foreground">{s.label}</p>
                 </div>
               </CardContent>
             </div>
@@ -231,4 +231,5 @@ export default function MyApplicationsPage() {
     </div>
   );
 }
+
 

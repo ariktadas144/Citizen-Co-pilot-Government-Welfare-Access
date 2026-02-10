@@ -4,10 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 async function isAdmin(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
   const { data } = await supabase
     .from("admin_users")
-    .select("id")
+    .select("id, enabled")
     .eq("id", userId)
     .single();
-  return !!data;
+  return !!data && data.enabled !== false;
 }
 
 // GET /api/admin/schemes — list all schemes
@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
         eligibility_rules: body.eligibility_rules || {},
         application_process: body.application_process || null,
         official_website: body.official_website || null,
+        poster_url: body.poster_url || null,
         category: body.category || "General",
         is_active: body.is_active ?? true,
       })

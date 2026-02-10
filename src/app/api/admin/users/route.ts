@@ -4,10 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 async function isAdmin(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
   const { data } = await supabase
     .from("admin_users")
-    .select("id")
+    .select("id, enabled")
     .eq("id", userId)
     .single();
-  return !!data;
+  return !!data && data.enabled !== false;
 }
 
 export async function GET() {
@@ -28,7 +28,30 @@ export async function GET() {
 
     if (error) throw error;
 
-    return NextResponse.json({ users: users || [] });
+    const payload = users || [];
+    let enriched = payload;
+
+    const userIds = payload.map((u) => u.id).filter(Boolean);
+    if (userIds.length > 0) {
+      const { data: faces, error: faceError } = await supabase
+        .from("faceverification")
+        .select("*")
+        .in("user_id", userIds);
+
+      if (!faceError && Array.isArray(faces)) {
+        const faceMap = new Map<string, Record<string, unknown>>();
+        faces.forEach((row) => {
+          const userId = (row as { user_id?: string }).user_id;
+          if (userId) faceMap.set(userId, row as Record<string, unknown>);
+        });
+        enriched = payload.map((u) => ({
+          ...u,
+          face_verification: faceMap.get(u.id) || null,
+        }));
+      }
+    }
+
+    return NextResponse.json({ users: enriched, profiles: enriched });
   } catch (error) {
     console.error("Admin users error:", error);
     return NextResponse.json(

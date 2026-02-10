@@ -73,8 +73,8 @@ export default function OrgOnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
-      <header className="border-b border-white/40 dark:border-white/10 bg-[#f0f0f3]/80 dark:bg-[hsl(240,10%,10%)]/80 backdrop-blur-md">
+    <div className="min-h-screen neo-surface-gradient">
+      <header className="border-b border-border bg-card/80 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-2xl items-center gap-2 px-4">
           <Shield className="h-5 w-5 text-emerald-600" />
           <span className="font-semibold text-foreground">Organization Onboarding</span>
@@ -88,7 +88,7 @@ export default function OrgOnboardingPage() {
               <Building2 className="h-7 w-7 text-emerald-600" />
             </div>
             <h1 className="text-2xl font-bold text-foreground">Register Your Organization</h1>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-muted-foreground">
               Complete your organization profile to start proposing welfare schemes.
             </p>
           </div>
@@ -145,9 +145,9 @@ export default function OrgOnboardingPage() {
                   <SelectTrigger className="neo-inset border-0">
                     <SelectValue placeholder="Select state" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="neo-elevated-lg border border-border/60 bg-card text-foreground">
                     {INDIAN_STATES.map((s) => (
-                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                      <SelectItem key={s} value={s} className="text-foreground focus:bg-muted/60">{s}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -194,3 +194,4 @@ export default function OrgOnboardingPage() {
     </div>
   );
 }
+

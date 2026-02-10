@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import "@/lib/i18n";
 import { tDb } from "@/lib/dbI18n";
+import { resolvePosterUrl } from "@/lib/utils";
 import Link from "next/link";
 
 interface Scheme {
@@ -26,6 +27,7 @@ interface Scheme {
   department: string | null;
   scheme_type: 'government' | 'private';
   official_website: string | null;
+  poster_url: string | null;
   eligibility_score?: number;
 }
 
@@ -150,7 +152,7 @@ export default function SchemesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+      <div className="min-h-screen flex items-center justify-center neo-surface-gradient">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -161,7 +163,7 @@ export default function SchemesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+    <div className="min-h-screen neo-surface-gradient">
       <Header />
 
       {/* Hero Section */}
@@ -184,17 +186,17 @@ export default function SchemesPage() {
       </section>
 
       {/* Search & Filters */}
-      <section className="sticky top-20 z-40 bg-gradient-to-br from-[#f0f0f3] to-[#e8e8eb] border-b border-black/5 py-4">
+      <section className="sticky top-20 z-40 neo-surface-alt border-b border-border/60 py-4">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 group-focus-within:text-emerald-600 group-focus-within:rotate-12 transition-all duration-300" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-emerald-600 group-focus-within:rotate-12 transition-all duration-300" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t("schemes.search") || "Search schemes..."}
-                className="pl-10 neo-inset rounded-xl border-0 text-slate-700 placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:scale-105 transition-transform duration-300"
+                className="pl-10 neo-inset rounded-xl border-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:scale-105 transition-transform duration-300"
               />
             </div>
 
@@ -202,7 +204,7 @@ export default function SchemesPage() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-2 rounded-xl neo-elevated text-slate-700 border-0 focus:neo-inset transition-all cursor-pointer hover:scale-105 hover:neo-elevated-sm"
+              className="px-4 py-2 rounded-xl neo-elevated text-foreground border-0 focus:neo-inset transition-all cursor-pointer hover:scale-105 hover:neo-elevated-sm"
             >
               <option value="all">All Categories</option>
               {categories.map((cat) => (
@@ -218,7 +220,7 @@ export default function SchemesPage() {
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="px-4 py-2 rounded-xl neo-elevated text-slate-700 border-0 focus:neo-inset transition-all cursor-pointer hover:scale-105 hover:neo-elevated-sm"
+              className="px-4 py-2 rounded-xl neo-elevated text-foreground border-0 focus:neo-inset transition-all cursor-pointer hover:scale-105 hover:neo-elevated-sm"
             >
               <option value="all">All Types</option>
               <option value="government">Government</option>
@@ -238,14 +240,14 @@ export default function SchemesPage() {
                   onClick={clearFilters}
                   className="rounded-xl neo-elevated hover:neo-inset hover:scale-110 transition-all duration-300 group"
                 >
-                  <X className="h-5 w-5 text-slate-700 group-hover:rotate-90 transition-transform duration-300" />
+                  <X className="h-5 w-5 text-foreground group-hover:rotate-90 transition-transform duration-300" />
                 </Button>
               </motion.div>
             )}
           </div>
 
           {/* Results Count */}
-          <div className="flex items-center gap-2 mt-3 text-sm text-slate-600">
+          <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
             <Filter className="h-4 w-4" />
             <span>
               Showing {filteredSchemes.length} of {schemes.length} schemes
@@ -273,17 +275,34 @@ export default function SchemesPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
+                    {(() => {
+                      const posterUrl = resolvePosterUrl(scheme.poster_url);
+                      return (
                     <Link href={`/scheme/${scheme.slug}`}>
                       <motion.div
                         whileHover={{ y: -8, scale: 1.02 }}
-                        className={`h-full p-6 neo-elevated-lg hover:neo-elevated-xl rounded-2xl transition-all relative overflow-hidden group ${
+                        className={`h-full neo-elevated-lg hover:neo-elevated-xl rounded-2xl transition-all relative overflow-hidden group ${
                           scheme.scheme_type === 'government'
                             ? 'neo-govt'
                             : 'neo-private'
                         }`}
                       >
+                        {/* Poster Image */}
+                        {posterUrl && (
+                          <div className="relative h-40 overflow-hidden">
+                            <img
+                              src={posterUrl}
+                              alt={tDb(t, "schemes", scheme.id, "scheme_name", scheme.scheme_name)}
+                              className="w-full h-full object-cover"
+                              onError={(e) => { e.currentTarget.parentElement!.style.display = 'none'; }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                          </div>
+                        )}
+
+                        <div className="p-6">
                         {/* Type Badge */}
-                        <div className="absolute top-4 right-4">
+                        <div className={`${posterUrl ? 'flex justify-end mb-2' : 'absolute top-4 right-4'}`}>
                           <Badge
                             className={`${
                               scheme.scheme_type === 'government'
@@ -310,12 +329,12 @@ export default function SchemesPage() {
                           </div>
                         )}
 
-                        <div className="mt-8 space-y-4">
-                          <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200 group-hover:text-foreground transition-colors line-clamp-2 group-hover:translate-x-1 duration-300">
+                        <div className="mt-4 space-y-4">
+                          <h3 className="text-lg font-bold text-foreground group-hover:text-emerald-600 transition-colors line-clamp-2 group-hover:translate-x-1 duration-300">
                             {tDb(t, "schemes", scheme.id, "scheme_name", scheme.scheme_name)}
                           </h3>
 
-                          <p className="text-sm text-slate-600 line-clamp-3 group-hover:text-slate-700 transition-colors duration-300">
+                          <p className="text-sm text-muted-foreground line-clamp-3 group-hover:text-foreground transition-colors duration-300">
                             {tDb(
                               t,
                               "schemes",
@@ -330,22 +349,25 @@ export default function SchemesPage() {
                               {tDb(t, "schemes", scheme.id, "category", scheme.category)}
                             </Badge>
                             {scheme.state && (
-                              <Badge variant="outline" className="text-xs border-slate-300 text-slate-600 group-hover:scale-105 transition-transform duration-300">
+                              <Badge variant="outline" className="text-xs border-border/60 text-muted-foreground group-hover:scale-105 transition-transform duration-300">
                                 {tDb(t, "schemes", scheme.id, "state", scheme.state)}
                               </Badge>
                             )}
                           </div>
 
                           {scheme.department && (
-                            <p className="text-xs text-slate-600 line-clamp-1 pt-2 border-t border-slate-200 group-hover:text-slate-700 transition-colors duration-300">
+                            <p className="text-xs text-muted-foreground line-clamp-1 pt-2 border-t border-border/60 group-hover:text-foreground transition-colors duration-300">
                               {tDb(t, "schemes", scheme.id, "department", scheme.department)}
                             </p>
                           )}
+                        </div>
                         </div>
 
                         {/* Hover Glow - removed for neomorphism */}
                       </motion.div>
                     </Link>
+                      );
+                    })()}
                   </motion.div>
                 ))}
               </motion.div>
@@ -362,10 +384,10 @@ export default function SchemesPage() {
                     animate={{ rotate: [0, 10, -10, 0] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    <Filter className="h-16 w-16 text-slate-500 mx-auto mb-4" />
+                    <Filter className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                   </motion.div>
-                  <h3 className="text-xl font-bold mb-2 text-slate-700">No schemes found</h3>
-                  <p className="text-slate-600 mb-4">
+                  <h3 className="text-xl font-bold mb-2 text-foreground">No schemes found</h3>
+                  <p className="text-muted-foreground mb-4">
                     Try adjusting your filters or search query
                   </p>
                   <Button onClick={clearFilters} className="neo-btn-primary rounded-xl hover:scale-105 transition-all duration-300">
@@ -383,3 +405,4 @@ export default function SchemesPage() {
     </div>
   );
 }
+

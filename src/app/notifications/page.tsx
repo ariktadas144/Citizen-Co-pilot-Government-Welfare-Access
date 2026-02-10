@@ -41,9 +41,9 @@ export default function NotificationsPage() {
   const removeNotif = useMutation(api.notifications.remove);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+    <div className="min-h-screen neo-surface-gradient">
       {/* Header */}
-      <div className="sticky top-0 z-50 border-b border-white/40 dark:border-white/10 bg-[#f0f0f3]/80 dark:bg-[hsl(240,10%,10%)]/80 backdrop-blur-xl">
+      <div className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
         <div className="container max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -82,10 +82,10 @@ export default function NotificationsPage() {
           <div className="neo-elevated-lg rounded-2xl border-0">
             <div className="flex flex-col items-center justify-center py-16 px-6">
               <div className="neo-inset rounded-full p-6 mb-6">
-                <Bell className="h-16 w-16 text-slate-400" />
+                <Bell className="h-16 w-16 text-muted-foreground/50" />
               </div>
               <h2 className="text-xl font-semibold mb-2 text-foreground">No notifications yet</h2>
-              <p className="text-slate-500 text-center max-w-md">
+              <p className="text-muted-foreground text-center max-w-md">
                 When you receive notifications about schemes, applications, or updates,
                 they&apos;ll appear here.
               </p>
@@ -136,14 +136,14 @@ export default function NotificationsPage() {
                               <span className="h-2 w-2 rounded-full bg-emerald-500" />
                             )}
                           </div>
-                          <p className="text-slate-500">
+                          <p className="text-muted-foreground">
                             {tDb(t, "notifications", n._id, "message", n.message)}
                           </p>
                           <div className="flex items-center gap-3 text-sm">
                             <Badge variant="outline" className="capitalize neo-elevated-sm border-0 rounded-lg">
                               {n.type.replace(/_/g, " ")}
                             </Badge>
-                            <span className="text-slate-400">
+                            <span className="text-muted-foreground">
                               {new Date(n.createdAt).toLocaleDateString(i18n.language, {
                                 day: "numeric",
                                 month: "short",
@@ -171,7 +171,7 @@ export default function NotificationsPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="neo-elevated-sm rounded-xl text-slate-400 hover:text-destructive"
+                            className="neo-elevated-sm rounded-xl text-muted-foreground hover:text-destructive"
                             onClick={(e) => {
                               e.stopPropagation();
                               removeNotif({ notificationId: n._id as Id<"notifications"> });
@@ -192,3 +192,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+

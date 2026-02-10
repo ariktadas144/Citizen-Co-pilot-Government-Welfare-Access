@@ -27,8 +27,9 @@ export async function updateSession(request: NextRequest) {
 
   // Refresh the session — IMPORTANT
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
 
   const { pathname } = request.nextUrl;
 
@@ -95,14 +96,16 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // Admin route protection
+  // Admin route protection — direct query (more reliable than RPC in middleware)
   if (user && pathname.startsWith("/admin")) {
-    // Direct admin check using the same supabase client (no self-fetch)
-    const { data: adminData } = await supabase.rpc("is_admin", {
-      user_id: user.id,
-    });
+    const { data: adminRow, error: adminError } = await supabase
+      .from("admin_users")
+      .select("id, role, enabled")
+      .eq("id", user.id)
+      .single();
 
-    if (!adminData) {
+    // Must exist, AND be enabled
+    if (adminError || !adminRow || adminRow.enabled === false) {
       const url = request.nextUrl.clone();
       url.pathname = "/home";
       return NextResponse.redirect(url);

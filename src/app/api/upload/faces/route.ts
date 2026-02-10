@@ -54,6 +54,22 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Store front face url in faceverification table (if available)
+    if (uploads.face_front_url) {
+      const { error: faceError } = await supabase
+        .from("faceverification")
+        .upsert(
+          {
+            user_id: user.id,
+            front_url: uploads.face_front_url,
+          },
+          { onConflict: "user_id" }
+        );
+      if (faceError) {
+        console.error("Face verification upsert error:", faceError);
+      }
+    }
+
     // Update user profile — set front face as avatar_url (profile picture)
     await supabase
       .from("user_profiles")

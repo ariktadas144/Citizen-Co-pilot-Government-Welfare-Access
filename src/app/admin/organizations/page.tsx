@@ -98,7 +98,7 @@ export default function AdminOrganizationsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
       </div>
     );
   }
@@ -106,12 +106,14 @@ export default function AdminOrganizationsPage() {
   return (
     <div className="p-6">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Organizations</h1>
+        <h1 className="text-2xl font-bold text-foreground">Organizations</h1>
         <div className="flex gap-2">
           <Button
             variant={tab === "orgs" ? "default" : "outline"}
             size="sm"
             onClick={() => setTab("orgs")}
+            className="rounded-xl"
+            className="rounded-xl"
           >
             <Building2 className="mr-1 h-4 w-4" />
             Orgs ({orgs.length})
@@ -120,6 +122,8 @@ export default function AdminOrganizationsPage() {
             variant={tab === "requests" ? "default" : "outline"}
             size="sm"
             onClick={() => setTab("requests")}
+            className="rounded-xl"
+            className="rounded-xl"
           >
             <Clock className="mr-1 h-4 w-4" />
             Requests ({pendingRequests.length})
@@ -131,7 +135,7 @@ export default function AdminOrganizationsPage() {
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search organizations..."
-          className="pl-9"
+          className="pl-9 neo-inset rounded-xl border-0"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -140,18 +144,18 @@ export default function AdminOrganizationsPage() {
       {tab === "orgs" ? (
         <div className="grid gap-3">
           {filteredOrgs.length === 0 ? (
-            <Card>
+            <Card className="neo-elevated-lg rounded-2xl border-0">
               <CardContent className="py-12 text-center text-muted-foreground">
                 No organizations found.
               </CardContent>
             </Card>
           ) : (
             filteredOrgs.map((org) => (
-              <Card key={org.id}>
+              <Card key={org.id} className="neo-elevated-lg rounded-2xl border-0">
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-base">{org.name}</CardTitle>
+                      <CardTitle className="text-base text-foreground">{org.name}</CardTitle>
                       <p className="text-sm text-muted-foreground">{org.work_email}</p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -168,7 +172,7 @@ export default function AdminOrganizationsPage() {
                     {org.state && <Badge variant="outline">{org.state}</Badge>}
                     {org.district && <Badge variant="outline">{org.district}</Badge>}
                     {org.website && (
-                      <a href={org.website} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">
+                      <a href={org.website} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 hover:underline">
                         {org.website}
                       </a>
                     )}
@@ -178,11 +182,11 @@ export default function AdminOrganizationsPage() {
                   )}
                   <div className="flex gap-2">
                     {!org.verified ? (
-                      <Button size="sm" onClick={() => handleVerify(org.id, true)}>
+                      <Button size="sm" onClick={() => handleVerify(org.id, true)} className="rounded-xl">
                         <CheckCircle2 className="mr-1 h-4 w-4" /> Verify
                       </Button>
                     ) : (
-                      <Button size="sm" variant="outline" onClick={() => handleVerify(org.id, false)}>
+                      <Button size="sm" variant="outline" onClick={() => handleVerify(org.id, false)} className="rounded-xl">
                         <XCircle className="mr-1 h-4 w-4" /> Unverify
                       </Button>
                     )}
@@ -195,7 +199,7 @@ export default function AdminOrganizationsPage() {
       ) : (
         <div className="grid gap-3">
           {requests.length === 0 ? (
-            <Card>
+            <Card className="neo-elevated-lg rounded-2xl border-0">
               <CardContent className="py-12 text-center text-muted-foreground">
                 No scheme requests.
               </CardContent>
@@ -204,11 +208,11 @@ export default function AdminOrganizationsPage() {
             requests.map((req) => {
               const sd = req.scheme_data as Record<string, string>;
               return (
-                <Card key={req.id}>
+                <Card key={req.id} className="neo-elevated-lg rounded-2xl border-0">
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-base">{sd.scheme_name || "Untitled"}</CardTitle>
+                        <CardTitle className="text-base text-foreground">{sd.scheme_name || "Untitled"}</CardTitle>
                         <p className="text-sm text-muted-foreground">
                           Category: {sd.category || "—"} • Dept: {sd.department || "—"}
                         </p>
@@ -234,10 +238,10 @@ export default function AdminOrganizationsPage() {
                     )}
                     {req.status === "pending" && (
                       <div className="flex gap-2">
-                        <Button size="sm" onClick={() => handleRequestAction(req.id, "approved")}>
+                        <Button size="sm" onClick={() => handleRequestAction(req.id, "approved")} className="rounded-xl">
                           <CheckCircle2 className="mr-1 h-4 w-4" /> Approve
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => handleRequestAction(req.id, "rejected")}>
+                        <Button size="sm" variant="outline" onClick={() => handleRequestAction(req.id, "rejected")} className="rounded-xl">
                           <XCircle className="mr-1 h-4 w-4" /> Reject
                         </Button>
                       </div>
@@ -257,3 +261,4 @@ export default function AdminOrganizationsPage() {
     </div>
   );
 }
+

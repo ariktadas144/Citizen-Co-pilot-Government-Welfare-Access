@@ -83,7 +83,7 @@ export default function OrgSchemesPage() {
   const [form, setForm] = useState({
     scheme_name: "", scheme_code: "", description: "", benefits: "",
     department: "", state: "", category: "", application_process: "",
-    official_website: "",
+    official_website: "", poster_url: "",
     age_min: "", age_max: "", income_max: "",
   });
 
@@ -140,7 +140,7 @@ export default function OrgSchemesPage() {
       setForm({
         scheme_name: "", scheme_code: "", description: "", benefits: "",
         department: "", state: "", category: "", application_process: "",
-        official_website: "", age_min: "", age_max: "", income_max: "",
+        official_website: "", poster_url: "", age_min: "", age_max: "", income_max: "",
       });
       loadData();
     } catch (err: unknown) {
@@ -271,6 +271,15 @@ export default function OrgSchemesPage() {
                     <Input value={form.official_website} onChange={(e) => update("official_website", e.target.value)} placeholder="https://..." />
                   </div>
                 </div>
+                <div className="space-y-2">
+                  <Label>Poster Image URL</Label>
+                  <Input value={form.poster_url} onChange={(e) => update("poster_url", e.target.value)} placeholder="https://... (image for scheme banner)" />
+                  {form.poster_url && (
+                    <div className="mt-2 rounded-lg overflow-hidden border h-32">
+                      <img src={form.poster_url} alt="Preview" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                    </div>
+                  )}
+                </div>
                 <Button onClick={handleSubmitScheme} disabled={submitting} className="w-full neo-btn-primary" size="lg">
                   {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileText className="mr-2 h-4 w-4" />}
                   {submitting ? "Submitting..." : "Submit for Review"}
@@ -390,3 +399,4 @@ export default function OrgSchemesPage() {
     </div>
   );
 }
+

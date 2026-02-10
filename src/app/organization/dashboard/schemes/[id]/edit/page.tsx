@@ -111,6 +111,7 @@ export default function SchemeEditorPage({ params }: PageProps) {
     state: "",
     category: "",
     official_website: "",
+    poster_url: "",
     is_active: true,
     age_min: "",
     age_max: "",
@@ -136,6 +137,7 @@ export default function SchemeEditorPage({ params }: PageProps) {
           state: s.state || "All India",
           category: s.category || "",
           official_website: s.official_website || "",
+          poster_url: s.poster_url || "",
           is_active: s.is_active ?? true,
           age_min: s.eligibility_rules?.age?.min?.toString() || "",
           age_max: s.eligibility_rules?.age?.max?.toString() || "",
@@ -214,6 +216,7 @@ export default function SchemeEditorPage({ params }: PageProps) {
           state: form.state === "All India" ? null : form.state || null,
           category: form.category,
           official_website: form.official_website,
+          poster_url: form.poster_url || null,
           is_active: form.is_active,
           eligibility_rules,
           application_form_fields: formFields,
@@ -331,6 +334,25 @@ export default function SchemeEditorPage({ params }: PageProps) {
           <div className="flex items-center gap-3">
             <Switch checked={form.is_active} onCheckedChange={(v) => update("is_active", v)} />
             <Label>Scheme is Active</Label>
+          </div>
+          <Separator />
+          <div className="space-y-2">
+            <Label>Poster Image URL</Label>
+            <Input
+              value={form.poster_url}
+              onChange={(e) => update("poster_url", e.target.value)}
+              placeholder="https://... (image URL for scheme poster/banner)"
+            />
+            {form.poster_url && (
+              <div className="mt-2 rounded-lg overflow-hidden border h-36">
+                <img
+                  src={form.poster_url}
+                  alt="Poster preview"
+                  className="w-full h-full object-cover"
+                  onError={(e) => (e.currentTarget.style.display = 'none')}
+                />
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

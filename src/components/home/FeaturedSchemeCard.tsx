@@ -3,11 +3,13 @@
 
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ExternalLink, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import "@/lib/i18n";
 import { tDb } from "@/lib/dbI18n";
+import { resolvePosterUrl } from "@/lib/utils";
 
 interface FeaturedSchemeCardProps {
   scheme: {
@@ -19,6 +21,7 @@ interface FeaturedSchemeCardProps {
     category: string;
     state: string | null;
     official_website: string | null;
+    poster_url?: string | null;
   };
   index: number;
 }
@@ -44,13 +47,14 @@ export function FeaturedSchemeCard({
   const state = scheme.state
     ? tDb(t, "schemes", schemeId, "state", scheme.state)
     : null;
+  const posterUrl = resolvePosterUrl(scheme.poster_url);
   // Use gradient background instead of external logo service
   const gradients = [
-    "from-emerald-400 to-emerald-600",
-    "from-teal-400 to-emerald-500",
-    "from-green-400 to-emerald-400",
-    "from-cyan-400 to-emerald-500",
-    "from-emerald-500 to-teal-500",
+    "from-primary to-primary",
+    "from-blue-500 to-cyan-500",
+    "from-indigo-500 to-purple-500",
+    "from-orange-500 to-red-500",
+    "from-pink-500 to-rose-500",
   ];
   const gradientClass = gradients[index % gradients.length];
 
@@ -69,31 +73,39 @@ export function FeaturedSchemeCard({
         <motion.div className="relative h-full">
           {/* Image Section */}
           <div className={`relative h-48 overflow-hidden bg-linear-to-br ${gradientClass}`}>
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center z-0">
               <div className="text-white/90 text-6xl font-bold">
                 {name.charAt(0)}
               </div>
             </div>
-            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
+            {posterUrl && (
+              <img
+                src={posterUrl}
+                alt={name}
+                className="absolute inset-0 w-full h-full object-cover z-1"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            )}
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent z-2" />
             
             {/* Category Badge */}
-            <div className="absolute top-4 left-4">
-                <Badge className="bg-emerald-600 text-white font-semibold px-3 py-1 border-0">
+            <div className="absolute top-4 left-4 z-3">
+                <Badge className="bg-primary text-primary-foreground font-semibold px-3 py-1 border-0">
                   {category}
               </Badge>
             </div>
 
             {/* State Badge */}
             {state && (
-              <div className="absolute top-4 right-4">
-                <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm neo-inset border-0 text-slate-700">
+              <div className="absolute top-4 right-4 z-3">
+                <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm neo-inset border-0 text-foreground">
                   {state}
                 </Badge>
               </div>
             )}
 
             {/* Featured Ribbon */}
-            <div className="absolute top-8 -right-10 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-12 py-1 rotate-45 text-xs font-bold shadow-lg">
+            <div className="absolute top-8 -right-10 bg-linear-to-r from-primary to-primary text-primary-foreground px-12 py-1 rotate-45 text-xs font-bold shadow-lg z-3">
               FEATURED
             </div>
           </div>
@@ -101,19 +113,19 @@ export function FeaturedSchemeCard({
           {/* Content Section */}
           <div className="p-6 space-y-4">
             <div>
-              <h3 className="text-xl font-bold text-slate-700 group-hover:text-emerald-600 transition-colors line-clamp-2 mb-2">
+              <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-2">
                 {name}
               </h3>
-              <p className="text-sm text-slate-600 line-clamp-3">
+              <p className="text-sm text-muted-foreground line-clamp-3">
                 {description}
               </p>
             </div>
 
             {/* Benefits Preview */}
             {benefits && (
-              <div className="pt-2 border-t border-slate-200">
-                <p className="text-xs text-slate-600 line-clamp-2">
-                  <span className="font-semibold text-emerald-600">{t("common.benefits")}:</span>{" "}
+              <div className="pt-2 border-t border-border">
+                <p className="text-xs text-muted-foreground line-clamp-2">
+                  <span className="font-semibold text-primary">{t("common.benefits")}:</span>{" "}
                   {benefits}
                 </p>
               </div>
@@ -122,14 +134,10 @@ export function FeaturedSchemeCard({
             {/* Action Buttons */}
             <div className="flex gap-2 pt-2">
               <Link href={`/scheme/${scheme.slug}`} className="flex-1">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="neo-btn-primary w-full px-4 py-2.5 rounded-lg font-medium text-sm flex items-center justify-center gap-2"
-                >
+                <Button className="w-full gap-2">
                   {t("common.viewDetails")}
                   <ArrowRight className="w-4 h-4" />
-                </motion.button>
+                </Button>
               </Link>
               
               {scheme.official_website && (

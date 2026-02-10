@@ -52,6 +52,7 @@ function NewSchemeForm() {
     category: "",
     application_process: "",
     official_website: "",
+    poster_url: "",
     // Eligibility rules (flat for form)
     age_min: "",
     age_max: "",
@@ -82,6 +83,7 @@ function NewSchemeForm() {
             category: scheme.category || "",
             application_process: scheme.application_process || "",
             official_website: scheme.official_website || "",
+            poster_url: scheme.poster_url || "",
             age_min: scheme.eligibility_rules?.age?.min?.toString() || "",
             age_max: scheme.eligibility_rules?.age?.max?.toString() || "",
             income_max: scheme.eligibility_rules?.income?.max?.toString() || "",
@@ -130,6 +132,7 @@ function NewSchemeForm() {
         category: form.category,
         application_process: form.application_process || null,
         official_website: form.official_website || null,
+        poster_url: form.poster_url || null,
         eligibility_rules,
       };
 
@@ -270,6 +273,25 @@ function NewSchemeForm() {
           </div>
 
           <div className="space-y-2">
+            <Label>Poster Image URL</Label>
+            <Input
+              value={form.poster_url}
+              onChange={(e) => updateForm("poster_url", e.target.value)}
+              placeholder="https://... (image URL for scheme poster/banner)"
+            />
+            {form.poster_url && (
+              <div className="mt-2 rounded-lg overflow-hidden border h-32">
+                <img
+                  src={form.poster_url}
+                  alt="Poster preview"
+                  className="w-full h-full object-cover"
+                  onError={(e) => (e.currentTarget.style.display = 'none')}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
             <Label>Application Process</Label>
             <Textarea
               value={form.application_process}
@@ -345,3 +367,4 @@ export default function NewSchemePage() {
     </Suspense>
   );
 }
+

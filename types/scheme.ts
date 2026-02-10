@@ -26,6 +26,7 @@ export interface Scheme {
   is_active: boolean;
   category: string;
   icon: string | null;
+  poster_url: string | null;
   created_by: string | null; // user id or org id
   scheme_type: 'government' | 'private'; // government = redirect, private = our form
   application_form_fields: ApplicationFormField[];

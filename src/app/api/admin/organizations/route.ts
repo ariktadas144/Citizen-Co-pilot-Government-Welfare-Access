@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 async function isAdmin(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
-  const { data } = await supabase.from("admin_users").select("id").eq("id", userId).single();
-  return !!data;
+  const { data } = await supabase.from("admin_users").select("id, enabled").eq("id", userId).single();
+  return !!data && data.enabled !== false;
 }
 
 // GET — list all organizations and scheme requests
@@ -109,6 +109,7 @@ export async function PATCH(request: NextRequest) {
           eligibility_rules: sd.eligibility_rules || {},
           application_process: sd.application_process || null,
           official_website: sd.official_website || null,
+          poster_url: sd.poster_url || null,
           created_by: orgData?.owner_id || null,
           scheme_type: "private",
           application_form_fields: [],

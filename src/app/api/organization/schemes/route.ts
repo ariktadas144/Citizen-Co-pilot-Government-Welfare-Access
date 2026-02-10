@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
           eligibility_rules: body.eligibility_rules || {},
           application_process: body.application_process || null,
           official_website: body.official_website || null,
+          poster_url: body.poster_url || null,
         },
         status: "pending",
       })

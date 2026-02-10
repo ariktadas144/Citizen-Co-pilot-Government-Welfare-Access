@@ -25,13 +25,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ isAdmin: false }, { status: 401 });
   }
 
-  const { data, error } = await supabase.rpc("is_admin", {
-    user_id: user.id,
-  });
+  // Direct query instead of RPC — more reliable, also checks enabled
+  const { data: adminRow, error } = await supabase
+    .from("admin_users")
+    .select("id, role, enabled")
+    .eq("id", user.id)
+    .single();
 
-  if (error) {
-    return NextResponse.json({ isAdmin: false }, { status: 500 });
+  if (error || !adminRow || adminRow.enabled === false) {
+    return NextResponse.json({ isAdmin: false }, { status: 200 });
   }
 
-  return NextResponse.json({ isAdmin: !!data });
+  return NextResponse.json({ isAdmin: true, role: adminRow.role });
 }

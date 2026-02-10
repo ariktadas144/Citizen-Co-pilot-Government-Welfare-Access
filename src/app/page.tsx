@@ -38,9 +38,9 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const features = [
   {
     icon: FileSearch,
-    title: "AI-Powered OCR",
+    title: "Profile Information",
     description:
-      "Upload your Aadhaar or Voter ID — our AI instantly extracts your details with Gemini Vision.",
+      "Update your profile details and setup.",
     color: "from-emerald-400 to-emerald-600",
   },
   {
@@ -183,15 +183,15 @@ export default function LandingPage() {
   const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+    <div className="min-h-screen neo-surface-gradient">
       {/* Navigation - Neomorphic */}
-      <nav className="sticky top-0 z-50 bg-gradient-to-r from-[#ececef] to-[#e8e8eb] backdrop-blur-xl border-b border-black/5 shadow-[0_8px_20px_rgba(163,177,198,0.3)]">
+      <nav className="sticky top-0 z-50 backdrop-blur-xl border-b border-border/60 neo-elevated">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="neo-elevated flex h-12 w-12 items-center justify-center rounded-2xl transition-transform group-hover:scale-105">
               <Shield className="h-6 w-6 text-emerald-600" />
             </div>
-            <span className="text-xl font-extrabold tracking-tight text-slate-700">
+            <span className="text-xl font-extrabold tracking-tight text-foreground">
               Citizen Copilot
             </span>
           </Link>
@@ -238,7 +238,7 @@ export default function LandingPage() {
             </motion.div>
 
             {/* Main Heading */}
-            <h1 className="mt-6 text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl text-slate-700">
+            <h1 className="mt-6 text-5xl font-black tracking-tight sm:text-6xl lg:text-7xl text-foreground">
               <span className="block">Discover Government Benefits</span>
               <span className="block mt-2 bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">
                 You Actually Deserve
@@ -246,7 +246,7 @@ export default function LandingPage() {
             </h1>
 
             {/* Subheading */}
-            <p className="mx-auto mt-8 max-w-3xl text-xl text-slate-600 leading-relaxed">
+            <p className="mx-auto mt-8 max-w-3xl text-xl text-muted-foreground leading-relaxed">
               Upload your ID, verify your identity with cutting-edge AI, and discover 
               <span className="font-bold text-emerald-600"> every government welfare scheme </span>
               you&apos;re eligible for — all in just 
@@ -293,10 +293,10 @@ export default function LandingPage() {
                   variants={fadeUp}
                 >
                   <s.icon className={`mx-auto mb-3 h-8 w-8 ${s.color} transition-transform group-hover:scale-110`} />
-                  <div className="text-3xl font-black text-slate-700">
+                  <div className="text-3xl font-black text-foreground">
                     {s.value}
                   </div>
-                  <div className="text-xs font-medium text-slate-500 mt-1">
+                  <div className="text-xs font-medium text-muted-foreground mt-1">
                     {s.label}
                   </div>
                 </motion.div>
@@ -883,4 +883,5 @@ export default function LandingPage() {
     </div>
   );
 }
+
 

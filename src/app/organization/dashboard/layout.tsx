@@ -41,10 +41,10 @@ export default function OrgDashboardLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+    <div className="flex min-h-screen neo-surface-gradient">
       {/* Sidebar */}
       <aside className="hidden w-60 flex-col neo-elevated md:flex rounded-none">
-        <div className="flex h-14 items-center gap-2 border-b border-white/40 dark:border-white/10 px-4">
+        <div className="flex h-14 items-center gap-2 border-b border-border px-4">
           <Building2 className="h-5 w-5 text-emerald-600" />
           <span className="font-bold text-emerald-700 dark:text-emerald-400 flex-1">Org Dashboard</span>
           <ThemeToggle />
@@ -69,7 +69,7 @@ export default function OrgDashboardLayout({
             );
           })}
         </nav>
-        <div className="border-t border-white/40 dark:border-white/10 p-3 space-y-1">
+        <div className="border-t border-border p-3 space-y-1">
           <Link href="/home">
             <Button variant="ghost" className="w-full justify-start" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -90,7 +90,7 @@ export default function OrgDashboardLayout({
 
       {/* Mobile Header */}
       <div className="flex flex-1 flex-col">
-        <header className="flex h-14 items-center gap-3 border-b border-white/40 dark:border-white/10 px-4 md:hidden bg-[#f0f0f3]/80 dark:bg-[hsl(240,10%,10%)]/80">
+        <header className="flex h-14 items-center gap-3 border-b border-border px-4 md:hidden bg-card/80">
           <Button
             variant="ghost"
             size="sm"
@@ -105,7 +105,7 @@ export default function OrgDashboardLayout({
 
         {/* Mobile Nav */}
         {mobileOpen && (
-          <div className="border-b border-white/40 dark:border-white/10 bg-[#f0f0f3] dark:bg-[hsl(240,10%,10%)] p-3 space-y-1 md:hidden">
+          <div className="border-b border-border bg-card p-3 space-y-1 md:hidden">
             {NAV_ITEMS.map((item) => {
               const active =
                 item.href === "/organization/dashboard"

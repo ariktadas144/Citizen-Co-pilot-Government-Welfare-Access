@@ -33,6 +33,7 @@ export default function ChatPage() {
   const [loadingThreads, setLoadingThreads] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sending, setSending] = useState(false);
+  const [creatingThread, setCreatingThread] = useState(false);
   const [input, setInput] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -98,13 +99,18 @@ export default function ChatPage() {
   }, []);
 
   const createThread = useCallback(async () => {
-    const res = await fetch("/api/chat/threads", { method: "POST" });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    setThreads((prev) => [data.thread, ...prev]);
-    setActiveThreadId(data.thread.id);
-    setMessages([]);
-    return data.thread as ChatThread;
+    setCreatingThread(true);
+    try {
+      const res = await fetch("/api/chat/threads", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setThreads((prev) => [data.thread, ...prev]);
+      setActiveThreadId(data.thread.id);
+      setMessages([]);
+      return data.thread as ChatThread;
+    } finally {
+      setCreatingThread(false);
+    }
   }, []);
 
   const renameThread = useCallback(async (threadId: string, title: string) => {
@@ -215,22 +221,22 @@ export default function ChatPage() {
 
   const markdownComponents = {
     p: (props: ComponentPropsWithoutRef<"p">) => (
-      <p className="text-sm leading-relaxed" {...props} />
+      <p className="text-sm leading-relaxed text-foreground" {...props} />
     ),
     a: (props: ComponentPropsWithoutRef<"a">) => (
-      <a className="underline underline-offset-2" target="_blank" rel="noreferrer" {...props} />
+      <a className="underline underline-offset-2 text-foreground" target="_blank" rel="noreferrer" {...props} />
     ),
     code: (props: ComponentPropsWithoutRef<"code">) => (
-      <code className="rounded bg-black/10 px-1 py-0.5 text-xs" {...props} />
+      <code className="rounded bg-muted/70 px-1 py-0.5 text-xs text-foreground" {...props} />
     ),
     pre: (props: ComponentPropsWithoutRef<"pre">) => (
-      <pre className="rounded-lg bg-black/10 p-2 text-xs overflow-x-auto" {...props} />
+      <pre className="rounded-lg bg-muted/70 p-2 text-xs overflow-x-auto text-foreground" {...props} />
     ),
     ul: (props: ComponentPropsWithoutRef<"ul">) => (
-      <ul className="list-disc pl-4 text-sm" {...props} />
+      <ul className="list-disc pl-4 text-sm text-foreground" {...props} />
     ),
     ol: (props: ComponentPropsWithoutRef<"ol">) => (
-      <ol className="list-decimal pl-4 text-sm" {...props} />
+      <ol className="list-decimal pl-4 text-sm text-foreground" {...props} />
     ),
     li: (props: ComponentPropsWithoutRef<"li">) => (
       <li className="mb-1" {...props} />
@@ -244,18 +250,18 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb] dark:from-[hsl(240,10%,8%)] dark:via-[hsl(240,10%,10%)] dark:to-[hsl(240,10%,8%)]">
+    <div className="h-screen neo-surface-gradient">
       <div className="flex h-full">
         {/* Sidebar */}
-        <aside className="hidden md:flex w-80 flex-col border-r border-black/5 dark:border-white/10 p-4 bg-gradient-to-br from-[#ececef] to-[#e8e8eb] dark:from-[hsl(240,10%,10%)] dark:to-[hsl(240,10%,8%)]">
+        <aside className="hidden md:flex w-80 flex-col border-r border-border/60 p-4 neo-surface-alt">
           <div className="flex items-center justify-between pb-4">
             <div className="flex items-center gap-2">
               <div className="neo-elevated h-9 w-9 rounded-xl flex items-center justify-center">
                 <Bot className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
-                <h2 className="text-sm font-semibold tracking-wide text-slate-700 dark:text-slate-200">Citizen Copilot</h2>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">Chat history</p>
+                <h2 className="text-sm font-semibold tracking-wide text-foreground">Citizen Copilot</h2>
+                <p className="text-[11px] text-muted-foreground">Chat history</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -266,16 +272,41 @@ export default function ChatPage() {
                 className="neo-elevated-sm rounded-xl h-8 w-8 hover:neo-inset-sm"
                 onClick={() => setSidebarOpen((v) => !v)}
               >
-                <PanelLeft className="h-4 w-4 text-slate-600 dark:text-slate-300" />
+                <PanelLeft className="h-4 w-4 text-muted-foreground" />
               </Button>
             </div>
           </div>
 
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <Link href="/home" className="w-full">
+              <Button
+                variant="ghost"
+                className="neo-elevated rounded-2xl w-full justify-start gap-2 hover:neo-inset-sm"
+              >
+                <ArrowLeft className="h-4 w-4" /> Home
+              </Button>
+            </Link>
+            <Link href="/profile" className="w-full">
+              <Button
+                variant="ghost"
+                className="neo-elevated rounded-2xl w-full justify-start gap-2 hover:neo-inset-sm"
+              >
+                <MessageCircle className="h-4 w-4" /> Profile
+              </Button>
+            </Link>
+          </div>
+
           <Button
             onClick={() => createThread()}
+            disabled={creatingThread}
             className="neo-btn-primary rounded-2xl w-full justify-start gap-2 mb-4"
           >
-            <Plus className="h-4 w-4" /> New chat
+            {creatingThread ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}
+            New chat
           </Button>
 
           <div className="mb-3">
@@ -283,15 +314,15 @@ export default function ChatPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search chats"
-              className="neo-inset rounded-2xl text-sm border-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:ring-0 focus-visible:outline-none"
+              className="neo-inset rounded-2xl text-sm border-none text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:outline-none"
             />
           </div>
 
           <div className="flex-1 overflow-y-auto neo-scrollbar pr-2 space-y-2">
             {loadingThreads ? (
-              <div className="text-xs text-slate-500 dark:text-slate-400">Loading chats...</div>
+              <div className="text-xs text-muted-foreground">Loading chats...</div>
             ) : filteredThreads.length === 0 ? (
-              <div className="text-xs text-slate-500 dark:text-slate-400">No conversations yet.</div>
+              <div className="text-xs text-muted-foreground">No conversations yet.</div>
             ) : (
               filteredThreads.map((thread) => (
                 <div
@@ -313,10 +344,10 @@ export default function ChatPage() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium truncate text-slate-700 dark:text-slate-200">
+                      <p className="text-sm font-medium truncate text-foreground">
                         {thread.title || "New chat"}
                       </p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                      <p className="text-[11px] text-muted-foreground line-clamp-1">
                         {thread.last_message || "Start a conversation"}
                       </p>
                     </div>
@@ -331,7 +362,7 @@ export default function ChatPage() {
                           setRenameValue(thread.title || "");
                         }}
                       >
-                        <Pencil className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
+                        <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
                       </Button>
                       <Button
                         size="icon"
@@ -355,15 +386,15 @@ export default function ChatPage() {
         {/* Mobile Sidebar */}
         {sidebarOpen && (
           <div className="md:hidden fixed inset-0 z-40 bg-black/30 dark:bg-black/50">
-            <div className="absolute left-0 top-0 h-full w-72 neo-elevated p-4 border-r border-black/5 dark:border-white/10 rounded-none">
+            <div className="absolute left-0 top-0 h-full w-72 neo-elevated p-4 border-r border-border/60 rounded-none">
               <div className="flex items-center justify-between pb-4">
                 <div className="flex items-center gap-2">
                   <div className="neo-elevated-sm h-9 w-9 rounded-xl flex items-center justify-center">
                     <Bot className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div>
-                    <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Citizen Copilot</h2>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">Chat history</p>
+                    <h2 className="text-sm font-semibold text-foreground">Citizen Copilot</h2>
+                    <p className="text-[11px] text-muted-foreground">Chat history</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -374,9 +405,30 @@ export default function ChatPage() {
                     className="neo-elevated-sm rounded-xl h-8 w-8 hover:neo-inset-sm"
                     onClick={() => setSidebarOpen(false)}
                   >
-                    <PanelLeft className="h-4 w-4 text-slate-600 dark:text-slate-300" />
+                    <PanelLeft className="h-4 w-4 text-muted-foreground" />
                   </Button>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <Link href="/home" className="w-full">
+                  <Button
+                    variant="ghost"
+                    className="neo-elevated rounded-2xl w-full justify-start gap-2 hover:neo-inset-sm"
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <ArrowLeft className="h-4 w-4" /> Home
+                  </Button>
+                </Link>
+                <Link href="/profile" className="w-full">
+                  <Button
+                    variant="ghost"
+                    className="neo-elevated rounded-2xl w-full justify-start gap-2 hover:neo-inset-sm"
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <MessageCircle className="h-4 w-4" /> Profile
+                  </Button>
+                </Link>
               </div>
 
               <Button
@@ -384,9 +436,15 @@ export default function ChatPage() {
                   createThread();
                   setSidebarOpen(false);
                 }}
+                disabled={creatingThread}
                 className="neo-btn-primary rounded-2xl w-full justify-start gap-2 mb-4"
               >
-                <Plus className="h-4 w-4" /> New chat
+                {creatingThread ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
+                New chat
               </Button>
 
               <div className="mb-3">
@@ -394,7 +452,7 @@ export default function ChatPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search chats"
-                  className="neo-inset rounded-2xl text-sm border-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:ring-0 focus-visible:outline-none"
+                  className="neo-inset rounded-2xl text-sm border-none text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:outline-none"
                 />
               </div>
 
@@ -421,10 +479,10 @@ export default function ChatPage() {
                         : "neo-elevated-sm hover:neo-inset-sm"
                     }`}
                   >
-                    <p className="text-sm font-medium truncate text-slate-700 dark:text-slate-200">
+                    <p className="text-sm font-medium truncate text-foreground">
                       {thread.title || "New chat"}
                     </p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                    <p className="text-[11px] text-muted-foreground line-clamp-1">
                       {thread.last_message || "Start a conversation"}
                     </p>
                     <div className="mt-2 flex items-center gap-2">
@@ -439,7 +497,7 @@ export default function ChatPage() {
                           setSidebarOpen(false);
                         }}
                       >
-                        <Pencil className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
+                        <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
                       </Button>
                       <Button
                         size="sm"
@@ -463,10 +521,10 @@ export default function ChatPage() {
 
         {/* Main */}
         <main className="flex-1 flex flex-col">
-          <div className="flex items-center justify-between border-b border-black/5 dark:border-white/10 px-4 py-3 neo-surface">
+          <div className="flex items-center justify-between border-b border-border/60 px-4 py-3 neo-surface">
             <div className="flex items-center gap-3">
               <Link href="/home" className="neo-elevated-sm rounded-xl h-9 w-9 flex items-center justify-center hover:neo-inset-sm transition-all">
-                <ArrowLeft className="h-4 w-4 text-slate-600 dark:text-slate-300" />
+                <ArrowLeft className="h-4 w-4 text-muted-foreground" />
               </Link>
               <Button
                 size="icon"
@@ -474,30 +532,29 @@ export default function ChatPage() {
                 className="md:hidden neo-elevated-sm h-9 w-9 rounded-xl hover:neo-inset-sm"
                 onClick={() => setSidebarOpen(true)}
               >
-                <PanelLeft className="h-4 w-4 text-slate-600 dark:text-slate-300" />
+                <PanelLeft className="h-4 w-4 text-muted-foreground" />
               </Button>
               <div className="neo-elevated-sm h-9 w-9 rounded-2xl flex items-center justify-center">
                 <MessageCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
-                <h1 className="text-sm font-semibold text-slate-700 dark:text-slate-200">{activeTitle}</h1>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">Citizen Copilot • Chat</p>
+                <h1 className="text-sm font-semibold text-foreground">{activeTitle}</h1>
+                <p className="text-[11px] text-muted-foreground">Citizen Copilot • Chat</p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="hidden md:block"><ThemeToggle /></div>
               <div className="relative">
                 <Button
                   variant="ghost"
-                  className="neo-elevated-sm rounded-2xl gap-2 text-xs text-slate-700 dark:text-slate-200 hover:neo-inset-sm"
+                  className="neo-elevated-sm rounded-2xl gap-2 text-xs text-foreground hover:neo-inset-sm"
                   onClick={() => setModelMenuOpen((v) => !v)}
                 >
                   {selectedModel}
                   <ChevronDown className="h-3.5 w-3.5" />
                 </Button>
                 {modelMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-2xl neo-elevated-lg p-2 z-20">
+                  <div className="absolute right-0 mt-2 w-56 rounded-2xl neo-elevated-lg p-2 z-20 text-foreground border border-border/60">
                     {modelOptions.map((model) => (
                       <button
                         key={model}
@@ -505,7 +562,7 @@ export default function ChatPage() {
                           setSelectedModel(model);
                           setModelMenuOpen(false);
                         }}
-                        className={`w-full rounded-xl px-3 py-2 text-left text-xs transition-all text-slate-700 dark:text-slate-200 ${
+                        className={`w-full rounded-xl px-3 py-2 text-left text-xs transition-all text-foreground ${
                           model === selectedModel
                             ? "neo-selected font-medium"
                             : "hover:neo-inset-sm"
@@ -526,15 +583,15 @@ export default function ChatPage() {
             className="flex-1 overflow-y-auto neo-scrollbar neo-surface-gradient px-4 py-6 space-y-4"
           >
             {loadingMessages ? (
-              <div className="text-sm text-slate-500 dark:text-slate-400">Loading messages...</div>
+              <div className="text-sm text-muted-foreground">Loading messages...</div>
             ) : messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-3 text-center h-full">
                 <div className="neo-inset-lg h-16 w-16 rounded-3xl flex items-center justify-center">
                   <Bot className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Start a new conversation</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Ask about schemes, eligibility, or benefits.</p>
+                  <p className="text-sm font-medium text-foreground">Start a new conversation</p>
+                  <p className="text-xs text-muted-foreground">Ask about schemes, eligibility, or benefits.</p>
                 </div>
               </div>
             ) : (
@@ -573,7 +630,7 @@ export default function ChatPage() {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-black/5 dark:border-white/10 neo-surface px-4 py-4">
+          <div className="border-t border-border/60 neo-surface px-4 py-4">
             <div className="mx-auto w-full max-w-4xl">
               <div className="flex items-end gap-3 rounded-3xl p-3 neo-elevated-lg">
                 <Textarea
@@ -587,7 +644,7 @@ export default function ChatPage() {
                   }}
                   placeholder="Ask about schemes, eligibility, or benefits..."
                   rows={1}
-                  className="flex-1 resize-none rounded-2xl border-none neo-inset px-4 py-3 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:ring-0 focus-visible:outline-none transition-all"
+                  className="flex-1 resize-none rounded-2xl border-none neo-inset px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:outline-none transition-all"
                 />
                 <Button
                   onClick={handleSend}
@@ -598,11 +655,11 @@ export default function ChatPage() {
                 </Button>
               </div>
               <div className="flex items-center justify-center gap-1.5 mt-2 opacity-60">
-                <span className="text-[10px] text-slate-500 dark:text-slate-400">Powered by</span>
+                <span className="text-[10px] text-muted-foreground">Powered by</span>
                 <img 
                   src="https://framerusercontent.com/images/B1pu30dG18pgu4LBa9DzkcdS3Q.png?scale-down-to=512&width=627&height=78" 
                   alt="Logo" 
-                  className="h-3 object-contain dark:invert dark:opacity-80"
+                  className="h-3 object-contain brightness-0 dark:invert dark:opacity-80"
                 />
               </div>
             </div>
@@ -611,22 +668,22 @@ export default function ChatPage() {
       </div>
 
       {renameTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/50 px-4">
-          <div className="w-full max-w-md rounded-3xl p-6 neo-container">
-            <h3 className="text-sm font-semibold mb-2 text-slate-700 dark:text-slate-200">Rename chat</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/50 backdrop-blur-sm px-4">
+          <div className="w-full max-w-md rounded-3xl p-6 neo-container text-foreground border border-border/60">
+            <h3 className="text-sm font-semibold mb-2 text-foreground">Rename chat</h3>
+            <p className="text-xs text-muted-foreground mb-4">
               Update the title for this conversation.
             </p>
             <Input
               value={renameValue}
               onChange={(e) => setRenameValue(e.target.value)}
               placeholder="Chat title"
-              className="neo-inset rounded-2xl border-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:ring-0 focus-visible:outline-none"
+              className="neo-inset rounded-2xl border-none text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:outline-none"
             />
             <div className="mt-4 flex items-center justify-end gap-2">
               <Button
                 variant="ghost"
-                className="rounded-xl neo-elevated hover:neo-inset-sm text-slate-700 dark:text-slate-200"
+                className="rounded-xl neo-elevated hover:neo-inset-sm text-foreground"
                 onClick={() => {
                   setRenameTarget(null);
                   setRenameValue("");
@@ -653,16 +710,16 @@ export default function ChatPage() {
       )}
 
       {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/50 px-4">
-          <div className="w-full max-w-md rounded-3xl p-6 neo-container">
-            <h3 className="text-sm font-semibold mb-2 text-slate-700 dark:text-slate-200">Delete chat?</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 dark:bg-black/50 backdrop-blur-sm px-4">
+          <div className="w-full max-w-md rounded-3xl p-6 neo-container text-foreground border border-border/60">
+            <h3 className="text-sm font-semibold mb-2 text-foreground">Delete chat?</h3>
+            <p className="text-xs text-muted-foreground mb-4">
               This removes the conversation and all its messages.
             </p>
             <div className="flex items-center justify-end gap-2">
               <Button
                 variant="ghost"
-                className="rounded-xl neo-elevated hover:neo-inset-sm text-slate-700 dark:text-slate-200"
+                className="rounded-xl neo-elevated hover:neo-inset-sm text-foreground"
                 onClick={() => setDeleteTarget(null)}
               >
                 Cancel
@@ -686,3 +743,4 @@ export default function ChatPage() {
     </div>
   );
 }
+

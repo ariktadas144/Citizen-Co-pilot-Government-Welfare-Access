@@ -39,10 +39,10 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-[#e8e8eb] via-[#f0f0f3] to-[#e8e8eb]">
+    <div className="flex min-h-screen neo-surface-gradient">
       {/* Sidebar */}
       <aside className="hidden w-60 flex-col neo-elevated md:flex rounded-none">
-        <div className="flex h-14 items-center gap-2 border-b border-white/40 dark:border-white/10 px-4">
+        <div className="flex h-14 items-center gap-2 border-b border-border px-4">
           <Shield className="h-5 w-5 text-emerald-600" />
           <span className="font-bold text-foreground flex-1">Admin Panel</span>
           <ThemeToggle />
@@ -71,7 +71,7 @@ export default function AdminLayout({
             );
           })}
         </nav>
-        <div className="border-t border-white/40 dark:border-white/10 p-3 space-y-1">
+        <div className="border-t border-border p-3 space-y-1">
           <Link href="/home">
             <Button variant="ghost" className="w-full justify-start" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -92,7 +92,7 @@ export default function AdminLayout({
 
       {/* Mobile Header */}
       <div className="flex flex-1 flex-col">
-        <header className="flex h-14 items-center gap-3 border-b border-white/40 dark:border-white/10 px-4 md:hidden bg-[#f0f0f3]/80 dark:bg-[hsl(240,10%,10%)]/80">
+        <header className="flex h-14 items-center gap-3 border-b border-border px-4 md:hidden bg-card/80">
           <Shield className="h-5 w-5 text-emerald-600" />
           <span className="font-bold">Admin</span>
           <div className="ml-auto flex items-center gap-1">

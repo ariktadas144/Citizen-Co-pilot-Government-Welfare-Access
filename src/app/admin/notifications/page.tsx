@@ -103,7 +103,7 @@ export default function AdminNotificationsPage() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Send Notifications</h1>
+        <h1 className="text-2xl font-bold text-foreground">Send Notifications</h1>
         <p className="text-muted-foreground">
           Send targeted notifications to users via Convex real-time system.
         </p>
@@ -111,9 +111,9 @@ export default function AdminNotificationsPage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Notification Form */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 neo-elevated-lg rounded-2xl border-0">
           <CardHeader>
-            <CardTitle>Compose Notification</CardTitle>
+            <CardTitle className="text-foreground">Compose Notification</CardTitle>
             <CardDescription>
               Fill in the details and choose your target audience.
             </CardDescription>
@@ -126,12 +126,13 @@ export default function AdminNotificationsPage() {
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
                   placeholder="Notification title"
+                  className="neo-inset rounded-xl border-0"
                 />
               </div>
               <div className="space-y-2">
                 <Label>Type</Label>
                 <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="neo-inset rounded-xl border-0">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -152,6 +153,7 @@ export default function AdminNotificationsPage() {
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
                 placeholder="Notification message..."
                 rows={3}
+                className="neo-inset rounded-xl border-0"
               />
             </div>
 
@@ -161,6 +163,7 @@ export default function AdminNotificationsPage() {
                 value={form.link}
                 onChange={(e) => setForm({ ...form, link: e.target.value })}
                 placeholder="/scheme/pm-kisan or https://..."
+                className="neo-inset rounded-xl border-0"
               />
             </div>
 
@@ -172,13 +175,13 @@ export default function AdminNotificationsPage() {
                   <button
                     key={t.value}
                     onClick={() => setForm({ ...form, targetType: t.value, targetValue: "" })}
-                    className={`flex items-start gap-3 rounded-lg border p-3 text-left transition-colors ${
+                    className={`flex items-start gap-3 rounded-xl border p-3 text-left transition-all ${
                       form.targetType === t.value
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:bg-muted/50"
+                        ? "border-emerald-500/60 bg-emerald-50/60 dark:bg-emerald-900/20"
+                        : "border-border/60 bg-card hover:bg-muted/30"
                     }`}
                   >
-                    <t.icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <t.icon className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                     <div>
                       <p className="text-sm font-medium">{t.label}</p>
                       <p className="text-xs text-muted-foreground">{t.description}</p>
@@ -193,7 +196,7 @@ export default function AdminNotificationsPage() {
               <div className="space-y-2">
                 <Label>State</Label>
                 <Select value={form.targetValue} onValueChange={(v) => setForm({ ...form, targetValue: v })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="neo-inset rounded-xl border-0">
                     <SelectValue placeholder="Select state" />
                   </SelectTrigger>
                   <SelectContent>
@@ -209,7 +212,7 @@ export default function AdminNotificationsPage() {
               <div className="space-y-2">
                 <Label>Caste Category</Label>
                 <Select value={form.targetValue} onValueChange={(v) => setForm({ ...form, targetValue: v })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="neo-inset rounded-xl border-0">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -225,7 +228,7 @@ export default function AdminNotificationsPage() {
               <div className="space-y-2">
                 <Label>Occupation</Label>
                 <Select value={form.targetValue} onValueChange={(v) => setForm({ ...form, targetValue: v })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="neo-inset rounded-xl border-0">
                     <SelectValue placeholder="Select occupation" />
                   </SelectTrigger>
                   <SelectContent>
@@ -244,11 +247,12 @@ export default function AdminNotificationsPage() {
                   value={form.targetValue}
                   onChange={(e) => setForm({ ...form, targetValue: e.target.value })}
                   placeholder="Supabase user UUID"
+                  className="neo-inset rounded-xl border-0"
                 />
               </div>
             )}
 
-            <Button onClick={handleSend} disabled={sending} className="w-full" size="lg">
+            <Button onClick={handleSend} disabled={sending} className="w-full rounded-xl" size="lg">
               {sending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
@@ -261,14 +265,14 @@ export default function AdminNotificationsPage() {
 
         {/* Preview + Status */}
         <div className="space-y-4">
-          <Card>
+          <Card className="neo-elevated-lg rounded-2xl border-0">
             <CardHeader>
               <CardTitle className="text-sm">Preview</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="rounded-lg border p-3 space-y-2">
+              <div className="rounded-xl border border-border/60 p-3 space-y-2 bg-card">
                 <div className="flex items-center gap-2">
-                  <Bell className="h-4 w-4 text-primary" />
+                  <Bell className="h-4 w-4 text-emerald-600" />
                   <span className="text-sm font-semibold">
                     {form.title || "Notification Title"}
                   </span>
@@ -290,7 +294,7 @@ export default function AdminNotificationsPage() {
           </Card>
 
           {sentCount !== null && (
-            <Card>
+            <Card className="neo-elevated-lg rounded-2xl border-0">
               <CardContent className="py-6 text-center">
                 <div className="text-3xl font-bold text-emerald-600">{sentCount}</div>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -304,4 +308,5 @@ export default function AdminNotificationsPage() {
     </div>
   );
 }
+
 
